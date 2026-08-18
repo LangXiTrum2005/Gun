@@ -84,6 +84,7 @@ class WeaponUseActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         shakeDetector?.start()
+        updateMuzzleFlashPosition()
     }
 
     override fun onPause() {
@@ -115,17 +116,19 @@ class WeaponUseActivity : AppCompatActivity() {
         binding.flSpine.addView(weaponImageView)
 
         val density = resources.displayMetrics.density
-        val flashSize = (140 * density).toInt()
-        val flashTopMargin = (85 * density).toInt()
+        val flashSize = (130 * density).toInt()
         muzzleFlashImageView = ImageView(this).apply {
             layoutParams = FrameLayout.LayoutParams(flashSize, flashSize).apply {
-                gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL
-                topMargin = flashTopMargin
+                gravity = Gravity.TOP or Gravity.START
             }
             scaleType = ImageView.ScaleType.FIT_CENTER
             visibility = View.GONE
         }
         binding.flSpine.addView(muzzleFlashImageView)
+
+        weaponImageView.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+            updateMuzzleFlashPosition()
+        }
 
         ammoCounterText = findViewById(R.id.tv_bullets_number_in_cartridge_clip)
         ammoSeparatorText = findViewById(R.id.tv_separator_bullets_number)
@@ -138,6 +141,34 @@ class WeaponUseActivity : AppCompatActivity() {
         val prefs = AppPreferences.get(this)
         val scene = WeaponRepository.sceneBackgrounds.getOrNull(prefs.currentBackgroundIndex)
         scene?.let { binding.clBg.setBackgroundResource(it.bgDrawableRes) }
+    }
+
+    private fun updateMuzzleFlashPosition() {
+        weaponImageView.post {
+            val drawable = weaponImageView.drawable ?: return@post
+            val dWidth = drawable.intrinsicWidth.toFloat()
+            val dHeight = drawable.intrinsicHeight.toFloat()
+            if (dWidth <= 0f || dHeight <= 0f) return@post
+
+            val vWidth = weaponImageView.width.toFloat()
+            val vHeight = weaponImageView.height.toFloat()
+            if (vWidth <= 0f || vHeight <= 0f) return@post
+
+            val scale = minOf(vWidth / dWidth, vHeight / dHeight)
+            val renderedWidth = dWidth * scale
+            val renderedHeight = dHeight * scale
+            val offsetX = (vWidth - renderedWidth) / 2f
+            val offsetY = (vHeight - renderedHeight) / 2f
+
+            val barrelTipX = offsetX + renderedWidth * weapon.muzzleXPercent
+            val barrelTipY = offsetY + renderedHeight * weapon.muzzleYPercent
+
+            val flashW = muzzleFlashImageView.layoutParams.width.toFloat()
+            val flashH = muzzleFlashImageView.layoutParams.height.toFloat()
+
+            muzzleFlashImageView.x = barrelTipX - (flashW / 2f)
+            muzzleFlashImageView.y = barrelTipY - (flashH * 0.75f)
+        }
     }
 
     private fun setupWeaponDisplay() {
@@ -311,7 +342,7 @@ class WeaponUseActivity : AppCompatActivity() {
         weaponImageView.translationY = 18f
         weaponImageView.animate().translationY(0f).setDuration(60).start()
 
-        // 4. Muzzle Flash Flare at barrel tip (Only for guns, not light sabers / bombs)
+        // 4. Muzzle Flash Flare precisely at the barrel tip
         if (weapon.type == WeaponType.MECHANICAL_GUN || weapon.type == WeaponType.SCI_FI_GUN) {
             val prefs = AppPreferences.get(this)
             val effectIndex = prefs.currentFiringEffectIndex

@@ -17,6 +17,8 @@ data class Weapon(
     val spinePath: String = "",
     val isBomb: Boolean = false,
     val bombType: Int = 0, // 0: C4, 1: Dial, 2: Slider, 3: Numpad
+    val muzzleXPercent: Float = 0.55f,
+    val muzzleYPercent: Float = 0.11f,
     var currentAmmo: Int = magazineCapacity,
     var currentClip: Int = cartridgeClipCount,
     var isUnlocked: Boolean = true

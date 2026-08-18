@@ -116,9 +116,10 @@ class WeaponUseActivity : AppCompatActivity() {
         binding.flSpine.addView(weaponImageView)
 
         val density = resources.displayMetrics.density
-        val flashSize = (130 * density).toInt()
+        val flashWidth = (90 * density).toInt()
+        val flashHeight = (150 * density).toInt()
         muzzleFlashImageView = ImageView(this).apply {
-            layoutParams = FrameLayout.LayoutParams(flashSize, flashSize).apply {
+            layoutParams = FrameLayout.LayoutParams(flashWidth, flashHeight).apply {
                 gravity = Gravity.TOP or Gravity.START
             }
             scaleType = ImageView.ScaleType.FIT_CENTER
@@ -166,8 +167,9 @@ class WeaponUseActivity : AppCompatActivity() {
             val flashW = muzzleFlashImageView.layoutParams.width.toFloat()
             val flashH = muzzleFlashImageView.layoutParams.height.toFloat()
 
+            // Perfectly centered horizontally on the barrel tip, projecting straight upward
             muzzleFlashImageView.x = barrelTipX - (flashW / 2f)
-            muzzleFlashImageView.y = barrelTipY - (flashH * 0.75f)
+            muzzleFlashImageView.y = barrelTipY - (flashH * 0.85f)
         }
     }
 
@@ -342,15 +344,15 @@ class WeaponUseActivity : AppCompatActivity() {
         weaponImageView.translationY = 18f
         weaponImageView.animate().translationY(0f).setDuration(60).start()
 
-        // 4. Muzzle Flash Flare precisely at the barrel tip
+        // 4. Single Straight Muzzle Flash Flare aligned directly with the barrel
         if (weapon.type == WeaponType.MECHANICAL_GUN || weapon.type == WeaponType.SCI_FI_GUN) {
             val prefs = AppPreferences.get(this)
             val effectIndex = prefs.currentFiringEffectIndex
             val effect = WeaponRepository.shootEffects.getOrNull(effectIndex) ?: WeaponRepository.shootEffects.first()
             muzzleFlashImageView.setImageResource(effect.effectDrawableRes)
-            muzzleFlashImageView.rotation = (-25..25).random().toFloat()
-            muzzleFlashImageView.scaleX = (90..115).random() / 100f
-            muzzleFlashImageView.scaleY = (90..115).random() / 100f
+            muzzleFlashImageView.rotation = 0f
+            muzzleFlashImageView.scaleX = 1.0f
+            muzzleFlashImageView.scaleY = 1.0f
             muzzleFlashImageView.visibility = View.VISIBLE
 
             mainHandler.removeCallbacks(hideFlashRunnable)

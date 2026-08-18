@@ -1,0 +1,10 @@
+package com.google.android.gms.measurement.internal;
+
+/* JADX INFO: loaded from: classes3.dex */
+public final class zzai {
+    long zza;
+    long zzb;
+    long zzc;
+    long zzd;
+    long zze;
+}

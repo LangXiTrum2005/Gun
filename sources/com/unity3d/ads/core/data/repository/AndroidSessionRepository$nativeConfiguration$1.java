@@ -1,0 +1,56 @@
+package com.unity3d.ads.core.data.repository;
+
+import com.badlogic.gdx.Input;
+import gun.simulator.gun.sounds.lightsaber.taser.timebombs.prank.view.AbstractC3375el;
+import gun.simulator.gun.sounds.lightsaber.taser.timebombs.prank.view.C5033xf0;
+import gun.simulator.gun.sounds.lightsaber.taser.timebombs.prank.view.Ea0;
+import gun.simulator.gun.sounds.lightsaber.taser.timebombs.prank.view.EnumC4602sk;
+import gun.simulator.gun.sounds.lightsaber.taser.timebombs.prank.view.InterfaceC2314Bl;
+import gun.simulator.gun.sounds.lightsaber.taser.timebombs.prank.view.InterfaceC2857Wj;
+import gun.simulator.gun.sounds.lightsaber.taser.timebombs.prank.view.InterfaceC3567gx;
+import gun.simulator.gun.sounds.lightsaber.taser.timebombs.prank.view.InterfaceC4443qv;
+import gun.simulator.gun.sounds.lightsaber.taser.timebombs.prank.view.InterfaceC4514rk;
+
+/* JADX INFO: loaded from: classes4.dex */
+@InterfaceC2314Bl(c = "com.unity3d.ads.core.data.repository.AndroidSessionRepository$nativeConfiguration$1", f = "AndroidSessionRepository.kt", l = {Input.Keys.NUMPAD_ADD}, m = "invokeSuspend")
+public final class AndroidSessionRepository$nativeConfiguration$1 extends Ea0 implements InterfaceC3567gx {
+    int label;
+    final /* synthetic */ AndroidSessionRepository this$0;
+
+    /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
+    public AndroidSessionRepository$nativeConfiguration$1(AndroidSessionRepository androidSessionRepository, InterfaceC2857Wj interfaceC2857Wj) {
+        super(2, interfaceC2857Wj);
+        this.this$0 = androidSessionRepository;
+    }
+
+    @Override // gun.simulator.gun.sounds.lightsaber.taser.timebombs.prank.view.AbstractC3677i9
+    public final InterfaceC2857Wj create(Object obj, InterfaceC2857Wj interfaceC2857Wj) {
+        return new AndroidSessionRepository$nativeConfiguration$1(this.this$0, interfaceC2857Wj);
+    }
+
+    @Override // gun.simulator.gun.sounds.lightsaber.taser.timebombs.prank.view.InterfaceC3567gx
+    public final Object invoke(InterfaceC4514rk interfaceC4514rk, InterfaceC2857Wj interfaceC2857Wj) {
+        return ((AndroidSessionRepository$nativeConfiguration$1) create(interfaceC4514rk, interfaceC2857Wj)).invokeSuspend(C5033xf0.f5238a);
+    }
+
+    @Override // gun.simulator.gun.sounds.lightsaber.taser.timebombs.prank.view.AbstractC3677i9
+    public final Object invokeSuspend(Object obj) {
+        EnumC4602sk enumC4602sk = EnumC4602sk.f4993a;
+        int i = this.label;
+        if (i == 0) {
+            AbstractC3375el.b0(obj);
+            InterfaceC4443qv interfaceC4443qv = this.this$0.persistedNativeConfiguration;
+            this.label = 1;
+            obj = AbstractC3375el.y(interfaceC4443qv, this);
+            if (obj == enumC4602sk) {
+                return enumC4602sk;
+            }
+        } else {
+            if (i != 1) {
+                throw new IllegalStateException("call to 'resume' before 'invoke' with coroutine");
+            }
+            AbstractC3375el.b0(obj);
+        }
+        return obj;
+    }
+}

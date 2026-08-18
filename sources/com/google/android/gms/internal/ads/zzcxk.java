@@ -1,0 +1,22 @@
+package com.google.android.gms.internal.ads;
+
+import java.util.Set;
+
+/* JADX INFO: loaded from: classes3.dex */
+public final class zzcxk implements zzher {
+    private final zzhfj zza;
+
+    public zzcxk(zzhfj zzhfjVar) {
+        this.zza = zzhfjVar;
+    }
+
+    public static zzcxj zzc(Set set) {
+        return new zzcxj(set);
+    }
+
+    @Override // com.google.android.gms.internal.ads.zzhfj, com.google.android.gms.internal.ads.zzhfi
+    /* JADX INFO: renamed from: zza, reason: merged with bridge method [inline-methods] */
+    public final zzcxj zzb() {
+        return new zzcxj(((zzhff) this.zza).zzb());
+    }
+}

@@ -1,0 +1,11 @@
+package com.google.android.gms.internal.ads;
+
+import java.util.Map;
+
+/* JADX INFO: loaded from: classes3.dex */
+final class zzbiz implements zzbjp {
+    @Override // com.google.android.gms.internal.ads.zzbjp
+    public final /* synthetic */ void zza(Object obj, Map map) {
+        com.google.android.gms.ads.internal.zzv.zzk().zzb();
+    }
+}

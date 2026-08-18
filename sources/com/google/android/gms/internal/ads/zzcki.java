@@ -1,0 +1,13 @@
+package com.google.android.gms.internal.ads;
+
+/* JADX INFO: loaded from: classes3.dex */
+public final class zzcki implements zzher {
+    public static zzbbu zza() {
+        return new zzbbu();
+    }
+
+    @Override // com.google.android.gms.internal.ads.zzhfj, com.google.android.gms.internal.ads.zzhfi
+    public final /* synthetic */ Object zzb() {
+        return zza();
+    }
+}

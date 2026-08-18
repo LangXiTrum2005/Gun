@@ -1,0 +1,25 @@
+package com.google.android.gms.internal.ads;
+
+import com.mbridge.msdk.playercommon.exoplayer2.C;
+
+/* JADX INFO: loaded from: classes3.dex */
+public final class zzaht extends zzadl implements zzahu {
+    public zzaht() {
+        super(C.TIME_UNSET, 0L);
+    }
+
+    @Override // com.google.android.gms.internal.ads.zzahu
+    public final int zzc() {
+        return -2147483647;
+    }
+
+    @Override // com.google.android.gms.internal.ads.zzahu
+    public final long zzd() {
+        return -1L;
+    }
+
+    @Override // com.google.android.gms.internal.ads.zzahu
+    public final long zze(long j) {
+        return 0L;
+    }
+}

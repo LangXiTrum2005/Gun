@@ -1,0 +1,8 @@
+package com.unity3d.ads.core.domain;
+
+import java.io.File;
+
+/* JADX INFO: loaded from: classes4.dex */
+public interface GetCacheDirectory {
+    File invoke(File file, String str);
+}

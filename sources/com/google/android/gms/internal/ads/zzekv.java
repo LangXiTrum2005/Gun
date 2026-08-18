@@ -1,0 +1,328 @@
+package com.google.android.gms.internal.ads;
+
+import android.app.Activity;
+import android.content.Context;
+import android.os.Bundle;
+import android.os.RemoteException;
+import androidx.annotation.Nullable;
+import com.google.android.gms.ads.internal.util.client.VersionInfoParcel;
+import com.google.android.gms.common.internal.Preconditions;
+import com.google.android.gms.dynamic.IObjectWrapper;
+import com.google.android.gms.dynamic.ObjectWrapper;
+
+/* JADX INFO: loaded from: classes3.dex */
+public final class zzekv extends com.google.android.gms.ads.internal.client.zzbx {
+    private final com.google.android.gms.ads.internal.client.zzs zza;
+    private final Context zzb;
+    private final zzezr zzc;
+    private final String zzd;
+    private final VersionInfoParcel zze;
+    private final zzekn zzf;
+    private final zzfar zzg;
+    private final zzava zzh;
+    private final zzdrw zzi;
+
+    @Nullable
+    private zzdeq zzj;
+    private boolean zzk = ((Boolean) com.google.android.gms.ads.internal.client.zzbe.zzc().zza(zzbcl.zzaO)).booleanValue();
+
+    public zzekv(Context context, com.google.android.gms.ads.internal.client.zzs zzsVar, String str, zzezr zzezrVar, zzekn zzeknVar, zzfar zzfarVar, VersionInfoParcel versionInfoParcel, zzava zzavaVar, zzdrw zzdrwVar) {
+        this.zza = zzsVar;
+        this.zzd = str;
+        this.zzb = context;
+        this.zzc = zzezrVar;
+        this.zzf = zzeknVar;
+        this.zzg = zzfarVar;
+        this.zze = versionInfoParcel;
+        this.zzh = zzavaVar;
+        this.zzi = zzdrwVar;
+    }
+
+    private final synchronized boolean zze() {
+        zzdeq zzdeqVar = this.zzj;
+        return (zzdeqVar == null || zzdeqVar.zza()) ? false : true;
+    }
+
+    @Override // com.google.android.gms.ads.internal.client.zzby
+    public final void zzA() {
+    }
+
+    @Override // com.google.android.gms.ads.internal.client.zzby
+    public final synchronized void zzB() {
+        Preconditions.checkMainThread("resume must be called on the main UI thread.");
+        zzdeq zzdeqVar = this.zzj;
+        if (zzdeqVar != null) {
+            zzdeqVar.zzn().zzc(null);
+        }
+    }
+
+    @Override // com.google.android.gms.ads.internal.client.zzby
+    public final void zzC(com.google.android.gms.ads.internal.client.zzbi zzbiVar) {
+    }
+
+    @Override // com.google.android.gms.ads.internal.client.zzby
+    public final void zzD(com.google.android.gms.ads.internal.client.zzbl zzblVar) {
+        Preconditions.checkMainThread("setAdListener must be called on the main UI thread.");
+        this.zzf.zzj(zzblVar);
+    }
+
+    @Override // com.google.android.gms.ads.internal.client.zzby
+    public final void zzE(com.google.android.gms.ads.internal.client.zzcc zzccVar) {
+        Preconditions.checkMainThread("setAdMetadataListener must be called on the main UI thread.");
+    }
+
+    @Override // com.google.android.gms.ads.internal.client.zzby
+    public final void zzF(com.google.android.gms.ads.internal.client.zzs zzsVar) {
+    }
+
+    @Override // com.google.android.gms.ads.internal.client.zzby
+    public final void zzG(com.google.android.gms.ads.internal.client.zzcm zzcmVar) {
+        Preconditions.checkMainThread("setAppEventListener must be called on the main UI thread.");
+        this.zzf.zzm(zzcmVar);
+    }
+
+    @Override // com.google.android.gms.ads.internal.client.zzby
+    public final void zzH(zzbag zzbagVar) {
+    }
+
+    @Override // com.google.android.gms.ads.internal.client.zzby
+    public final void zzI(com.google.android.gms.ads.internal.client.zzy zzyVar) {
+    }
+
+    @Override // com.google.android.gms.ads.internal.client.zzby
+    public final void zzJ(com.google.android.gms.ads.internal.client.zzct zzctVar) {
+        this.zzf.zzn(zzctVar);
+    }
+
+    @Override // com.google.android.gms.ads.internal.client.zzby
+    public final void zzK(com.google.android.gms.ads.internal.client.zzef zzefVar) {
+    }
+
+    @Override // com.google.android.gms.ads.internal.client.zzby
+    public final synchronized void zzL(boolean z) {
+        Preconditions.checkMainThread("setImmersiveMode must be called on the main UI thread.");
+        this.zzk = z;
+    }
+
+    @Override // com.google.android.gms.ads.internal.client.zzby
+    public final void zzM(zzbtn zzbtnVar) {
+    }
+
+    @Override // com.google.android.gms.ads.internal.client.zzby
+    public final void zzN(boolean z) {
+    }
+
+    @Override // com.google.android.gms.ads.internal.client.zzby
+    public final synchronized void zzO(zzbdg zzbdgVar) {
+        Preconditions.checkMainThread("setOnCustomRenderedAdLoadedListener must be called on the main UI thread.");
+        this.zzc.zzi(zzbdgVar);
+    }
+
+    @Override // com.google.android.gms.ads.internal.client.zzby
+    public final void zzP(com.google.android.gms.ads.internal.client.zzdr zzdrVar) {
+        Preconditions.checkMainThread("setPaidEventListener must be called on the main UI thread.");
+        try {
+            if (!zzdrVar.zzf()) {
+                this.zzi.zze();
+            }
+        } catch (RemoteException e) {
+            com.google.android.gms.ads.internal.util.client.zzo.zzf("Error in making CSI ping for reporting paid event callback", e);
+        }
+        this.zzf.zzl(zzdrVar);
+    }
+
+    @Override // com.google.android.gms.ads.internal.client.zzby
+    public final void zzQ(zzbtq zzbtqVar, String str) {
+    }
+
+    @Override // com.google.android.gms.ads.internal.client.zzby
+    public final void zzR(String str) {
+    }
+
+    @Override // com.google.android.gms.ads.internal.client.zzby
+    public final void zzS(zzbwc zzbwcVar) {
+        this.zzg.zzm(zzbwcVar);
+    }
+
+    @Override // com.google.android.gms.ads.internal.client.zzby
+    public final void zzT(String str) {
+    }
+
+    @Override // com.google.android.gms.ads.internal.client.zzby
+    public final void zzU(com.google.android.gms.ads.internal.client.zzga zzgaVar) {
+    }
+
+    @Override // com.google.android.gms.ads.internal.client.zzby
+    public final synchronized void zzW(IObjectWrapper iObjectWrapper) {
+        if (this.zzj == null) {
+            com.google.android.gms.ads.internal.util.client.zzo.zzj("Interstitial can not be shown before loaded.");
+            this.zzf.zzq(zzfdk.zzd(9, null, null));
+            return;
+        }
+        if (((Boolean) com.google.android.gms.ads.internal.client.zzbe.zzc().zza(zzbcl.zzcT)).booleanValue()) {
+            this.zzh.zzc().zzn(new Throwable().getStackTrace());
+        }
+        this.zzj.zzc(this.zzk, (Activity) ObjectWrapper.unwrap(iObjectWrapper));
+    }
+
+    @Override // com.google.android.gms.ads.internal.client.zzby
+    public final synchronized void zzX() {
+        Preconditions.checkMainThread("showInterstitial must be called on the main UI thread.");
+        if (this.zzj == null) {
+            com.google.android.gms.ads.internal.util.client.zzo.zzj("Interstitial can not be shown before loaded.");
+            this.zzf.zzq(zzfdk.zzd(9, null, null));
+        } else {
+            if (((Boolean) com.google.android.gms.ads.internal.client.zzbe.zzc().zza(zzbcl.zzcT)).booleanValue()) {
+                this.zzh.zzc().zzn(new Throwable().getStackTrace());
+            }
+            this.zzj.zzc(this.zzk, null);
+        }
+    }
+
+    @Override // com.google.android.gms.ads.internal.client.zzby
+    public final synchronized boolean zzY() {
+        return false;
+    }
+
+    @Override // com.google.android.gms.ads.internal.client.zzby
+    public final synchronized boolean zzZ() {
+        return this.zzc.zza();
+    }
+
+    @Override // com.google.android.gms.ads.internal.client.zzby
+    public final synchronized boolean zzaa() {
+        Preconditions.checkMainThread("isLoaded must be called on the main UI thread.");
+        return zze();
+    }
+
+    /* JADX WARN: Code duplicated, block: B:11:0x002b  */
+    @Override // com.google.android.gms.ads.internal.client.zzby
+    public final synchronized boolean zzab(com.google.android.gms.ads.internal.client.zzm zzmVar) {
+        boolean z;
+        try {
+            if (!zzmVar.zzb()) {
+                if (((Boolean) zzbej.zzi.zze()).booleanValue()) {
+                    if (((Boolean) com.google.android.gms.ads.internal.client.zzbe.zzc().zza(zzbcl.zzla)).booleanValue()) {
+                        z = true;
+                    } else {
+                        z = false;
+                    }
+                } else {
+                    z = false;
+                }
+                if (this.zze.clientJarVersion < ((Integer) com.google.android.gms.ads.internal.client.zzbe.zzc().zza(zzbcl.zzlb)).intValue() || !z) {
+                    Preconditions.checkMainThread("loadAd must be called on the main UI thread.");
+                }
+            }
+            com.google.android.gms.ads.internal.zzv.zzq();
+            if (com.google.android.gms.ads.internal.util.zzs.zzI(this.zzb) && zzmVar.zzs == null) {
+                com.google.android.gms.ads.internal.util.client.zzo.zzg("Failed to load the ad because app ID is missing.");
+                zzekn zzeknVar = this.zzf;
+                if (zzeknVar != null) {
+                    zzeknVar.zzdz(zzfdk.zzd(4, null, null));
+                }
+            } else if (!zze()) {
+                zzfdg.zza(this.zzb, zzmVar.zzf);
+                this.zzj = null;
+                return this.zzc.zzb(zzmVar, this.zzd, new zzezk(this.zza), new zzeku(this));
+            }
+            return false;
+        } catch (Throwable th) {
+            throw th;
+        }
+    }
+
+    @Override // com.google.android.gms.ads.internal.client.zzby
+    public final void zzac(com.google.android.gms.ads.internal.client.zzcq zzcqVar) {
+    }
+
+    @Override // com.google.android.gms.ads.internal.client.zzby
+    public final Bundle zzd() {
+        Preconditions.checkMainThread("getAdMetadata must be called on the main UI thread.");
+        return new Bundle();
+    }
+
+    @Override // com.google.android.gms.ads.internal.client.zzby
+    public final com.google.android.gms.ads.internal.client.zzs zzg() {
+        return null;
+    }
+
+    @Override // com.google.android.gms.ads.internal.client.zzby
+    public final com.google.android.gms.ads.internal.client.zzbl zzi() {
+        return this.zzf.zzg();
+    }
+
+    @Override // com.google.android.gms.ads.internal.client.zzby
+    public final com.google.android.gms.ads.internal.client.zzcm zzj() {
+        return this.zzf.zzi();
+    }
+
+    @Override // com.google.android.gms.ads.internal.client.zzby
+    @Nullable
+    public final synchronized com.google.android.gms.ads.internal.client.zzdy zzk() {
+        zzdeq zzdeqVar;
+        if (((Boolean) com.google.android.gms.ads.internal.client.zzbe.zzc().zza(zzbcl.zzgC)).booleanValue() && (zzdeqVar = this.zzj) != null) {
+            return zzdeqVar.zzm();
+        }
+        return null;
+    }
+
+    @Override // com.google.android.gms.ads.internal.client.zzby
+    public final com.google.android.gms.ads.internal.client.zzeb zzl() {
+        return null;
+    }
+
+    @Override // com.google.android.gms.ads.internal.client.zzby
+    public final IObjectWrapper zzn() {
+        return null;
+    }
+
+    @Override // com.google.android.gms.ads.internal.client.zzby
+    public final synchronized String zzr() {
+        return this.zzd;
+    }
+
+    @Override // com.google.android.gms.ads.internal.client.zzby
+    @Nullable
+    public final synchronized String zzs() {
+        zzdeq zzdeqVar = this.zzj;
+        if (zzdeqVar == null || zzdeqVar.zzm() == null) {
+            return null;
+        }
+        return zzdeqVar.zzm().zzg();
+    }
+
+    @Override // com.google.android.gms.ads.internal.client.zzby
+    @Nullable
+    public final synchronized String zzt() {
+        zzdeq zzdeqVar = this.zzj;
+        if (zzdeqVar == null || zzdeqVar.zzm() == null) {
+            return null;
+        }
+        return zzdeqVar.zzm().zzg();
+    }
+
+    @Override // com.google.android.gms.ads.internal.client.zzby
+    public final synchronized void zzx() {
+        Preconditions.checkMainThread("destroy must be called on the main UI thread.");
+        zzdeq zzdeqVar = this.zzj;
+        if (zzdeqVar != null) {
+            zzdeqVar.zzn().zza(null);
+        }
+    }
+
+    @Override // com.google.android.gms.ads.internal.client.zzby
+    public final void zzy(com.google.android.gms.ads.internal.client.zzm zzmVar, com.google.android.gms.ads.internal.client.zzbo zzboVar) {
+        this.zzf.zzk(zzboVar);
+        zzab(zzmVar);
+    }
+
+    @Override // com.google.android.gms.ads.internal.client.zzby
+    public final synchronized void zzz() {
+        Preconditions.checkMainThread("pause must be called on the main UI thread.");
+        zzdeq zzdeqVar = this.zzj;
+        if (zzdeqVar != null) {
+            zzdeqVar.zzn().zzb(null);
+        }
+    }
+}

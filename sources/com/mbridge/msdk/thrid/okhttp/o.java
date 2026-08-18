@@ -1,0 +1,78 @@
+package com.mbridge.msdk.thrid.okhttp;
+
+import java.io.IOException;
+import java.security.cert.Certificate;
+import java.util.Collections;
+import java.util.List;
+import javax.annotation.Nullable;
+import javax.net.ssl.SSLPeerUnverifiedException;
+import javax.net.ssl.SSLSession;
+
+/* JADX INFO: loaded from: classes2.dex */
+public final class o {
+
+    /* JADX INFO: renamed from: a, reason: collision with root package name */
+    private final b0 f1984a;
+    private final f b;
+    private final List<Certificate> c;
+    private final List<Certificate> d;
+
+    private o(b0 b0Var, f fVar, List<Certificate> list, List<Certificate> list2) {
+        this.f1984a = b0Var;
+        this.b = fVar;
+        this.c = list;
+        this.d = list2;
+    }
+
+    public static o a(SSLSession sSLSession) throws IOException {
+        Certificate[] peerCertificates;
+        String cipherSuite = sSLSession.getCipherSuite();
+        if (cipherSuite == null) {
+            throw new IllegalStateException("cipherSuite == null");
+        }
+        if ("SSL_NULL_WITH_NULL_NULL".equals(cipherSuite)) {
+            throw new IOException("cipherSuite == SSL_NULL_WITH_NULL_NULL");
+        }
+        f fVarA = f.a(cipherSuite);
+        String protocol = sSLSession.getProtocol();
+        if (protocol == null) {
+            throw new IllegalStateException("tlsVersion == null");
+        }
+        if ("NONE".equals(protocol)) {
+            throw new IOException("tlsVersion == NONE");
+        }
+        b0 b0VarA = b0.a(protocol);
+        try {
+            peerCertificates = sSLSession.getPeerCertificates();
+        } catch (SSLPeerUnverifiedException unused) {
+            peerCertificates = null;
+        }
+        List listA = peerCertificates != null ? com.mbridge.msdk.thrid.okhttp.internal.c.a(peerCertificates) : Collections.emptyList();
+        Certificate[] localCertificates = sSLSession.getLocalCertificates();
+        return new o(b0VarA, fVarA, listA, localCertificates != null ? com.mbridge.msdk.thrid.okhttp.internal.c.a(localCertificates) : Collections.emptyList());
+    }
+
+    public List<Certificate> b() {
+        return this.c;
+    }
+
+    public b0 c() {
+        return this.f1984a;
+    }
+
+    public boolean equals(@Nullable Object obj) {
+        if (!(obj instanceof o)) {
+            return false;
+        }
+        o oVar = (o) obj;
+        return this.f1984a.equals(oVar.f1984a) && this.b.equals(oVar.b) && this.c.equals(oVar.c) && this.d.equals(oVar.d);
+    }
+
+    public int hashCode() {
+        return this.d.hashCode() + ((this.c.hashCode() + ((this.b.hashCode() + ((this.f1984a.hashCode() + 527) * 31)) * 31)) * 31);
+    }
+
+    public f a() {
+        return this.b;
+    }
+}

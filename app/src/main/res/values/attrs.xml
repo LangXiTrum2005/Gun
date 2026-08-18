@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ColorSeekBarVertical -->
+    <declare-styleable name="ColorSeekBarVertical">
+        <attr name="barWidth" format="dimension" />
+        <attr name="bgPadding" format="dimension" />
+        <attr name="colorSeeds" format="reference" />
+        <attr name="cornerRadius" format="dimension" />
+        <attr name="paddingBottom" format="dimension" />
+        <attr name="paddingTop" format="dimension" />
+        <attr name="seekBarBg" format="reference" />
+        <attr name="seekBarFg" format="reference" />
+        <attr name="thumbBg" format="reference" />
+        <attr name="thumbBorder" format="dimension" />
+        <attr name="thumbBorderColor" format="color" />
+    </declare-styleable>
+
+    <!-- KnobProgressBar -->
+    <declare-styleable name="KnobProgressBar">
+        <attr name="android:max" />
+        <attr name="android:progress" />
+        <attr name="android_min" format="integer" />
+        <attr name="progressBg" format="reference" />
+        <attr name="progressFg" format="reference" />
+        <attr name="progressSrc" format="reference" />
+        <attr name="scaleEnd" format="float" />
+        <attr name="scaleStart" format="float" />
+        <attr name="thumb" format="reference" />
+    </declare-styleable>
+
+    <!-- LinerCustomSeekBar -->
+    <declare-styleable name="LinerCustomSeekBar">
+        <attr name="backgroundDrawable" format="reference" />
+        <attr name="foregroundDrawable" format="reference" />
+        <attr name="maxProgress" format="integer" />
+        <attr name="thumbDrawable" format="reference" />
+    </declare-styleable>
+
+    <!-- RadiusImageView -->
+    <declare-styleable name="RadiusImageView">
+        <attr name="radius" format="dimension" />
+        <attr name="radiusLeftBottom" format="dimension" />
+        <attr name="radiusLeftTop" format="dimension" />
+        <attr name="radiusRightBottom" format="dimension" />
+        <attr name="radiusRightTop" format="dimension" />
+        <attr name="border_width" format="dimension" />
+        <attr name="border_color" format="color" />
+    </declare-styleable>
+
+    <!-- ArrowView -->
+    <declare-styleable name="ArrowView">
+        <attr name="arrowColor" format="color" />
+        <attr name="arrowWidth" format="dimension" />
+    </declare-styleable>
+</resources>

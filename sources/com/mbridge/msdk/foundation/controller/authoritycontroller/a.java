@@ -1,0 +1,68 @@
+package com.mbridge.msdk.foundation.controller.authoritycontroller;
+
+import android.text.TextUtils;
+
+/* JADX INFO: loaded from: classes2.dex */
+public class a {
+
+    /* JADX INFO: renamed from: a, reason: collision with root package name */
+    protected int f1117a;
+    protected int b;
+    protected int c;
+    protected int d;
+
+    public void a(int i) {
+        this.f1117a = i;
+        this.b = i;
+        this.c = i;
+    }
+
+    public void authDeviceIdStatus(int i) {
+        this.b = i;
+    }
+
+    public void authGenDataStatus(int i) {
+        this.f1117a = i;
+    }
+
+    public void authOtherDataStatus(int i) {
+        this.d = i;
+    }
+
+    public void authSerialIdStatus(int i) {
+        this.c = i;
+    }
+
+    public int getAuthDeviceIdStatus() {
+        return this.b;
+    }
+
+    public int getAuthGenDataStatus() {
+        return this.f1117a;
+    }
+
+    public int getAuthSerialIdStatus() {
+        return this.c;
+    }
+
+    public int getOtherDataStatus() {
+        return this.d;
+    }
+
+    public int getStatusByKey(String str) {
+        if (!TextUtils.isEmpty(str)) {
+            str.getClass();
+            switch (str) {
+                case "authority_serial_id":
+                    return this.c;
+                case "authority_device_id":
+                    return this.b;
+                case "authority_general_data":
+                    return this.f1117a;
+                case "authority_other":
+                    return this.d;
+            }
+        }
+        return 1;
+    }
+}

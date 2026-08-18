@@ -178,7 +178,7 @@ class WeaponUseActivity : AppCompatActivity() {
             val flashW = muzzleFlashImageView.layoutParams.width.toFloat()
             val flashH = muzzleFlashImageView.layoutParams.height.toFloat()
 
-            // Perfectly centered horizontally on the barrel tip, projecting straight upward
+            // Centered horizontally on the barrel tip, projecting straight upward
             muzzleFlashImageView.x = barrelTipX - (flashW / 2f)
             muzzleFlashImageView.y = barrelTipY - (flashH * 0.88f)
         }
@@ -382,7 +382,7 @@ class WeaponUseActivity : AppCompatActivity() {
         flashManager.flashOnce(50L)
         vibrationManager.vibrateShot(60L)
 
-        // 3. Recoil Animation (Gun bounces back realistically)
+        // 3. Recoil Animation
         weaponImageView.translationY = 18f
         weaponImageView.animate().translationY(0f).setDuration(60).start()
 
@@ -559,10 +559,22 @@ class WeaponUseActivity : AppCompatActivity() {
         findViewById<View>(R.id.iv_unlimited_bullet)?.visibility = View.GONE
 
         if (weapon.bombType == 0) {
-            // C4 Keypad Bomb
+            // C4 Keypad Bomb + Bottom Console Confirm Bar
             try {
                 val c4View = binding.vbTimeBombC4.inflate()
                 val c4Binding = LayoutTimeBombC4Binding.bind(c4View)
+
+                val bombConsoleView = binding.vbTimeBomb.inflate()
+                val consoleBinding = LayoutTimeBombBinding.bind(bombConsoleView)
+
+                // Hide time display on the bottom console since C4 displays it on its own LCD screen
+                consoleBinding.bgTime.visibility = View.INVISIBLE
+                consoleBinding.tvTimer.visibility = View.INVISIBLE
+
+                bombSeconds = 5
+                c4Binding.tvTimer.text = String.format("%02d:%02d", bombSeconds / 60, bombSeconds % 60)
+
+                var inputAccumulator = 5
 
                 val numberButtons = listOf(
                     c4Binding.tvNumber1 to 1,
@@ -576,14 +588,75 @@ class WeaponUseActivity : AppCompatActivity() {
                     c4Binding.tvNumber9 to 9
                 )
 
-                numberButtons.forEach { (tv, seconds) ->
+                // Number keypad input (allows typing custom times without starting immediately)
+                numberButtons.forEach { (tv, digit) ->
                     tv.setOnClickListener {
                         soundManager.playSound("weaponsound/bomb/bomb_btn_c4.ogg")
+                        vibrationManager.vibrateShot(30L)
                         if (!isBombActive) {
-                            c4Binding.tvTimer.text = String.format("00:%02d", seconds)
-                            startBombCountdown(seconds) { remaining ->
-                                c4Binding.tvTimer.text = String.format("00:%02d", remaining)
+                            if (inputAccumulator == 5) {
+                                inputAccumulator = digit
+                            } else {
+                                inputAccumulator = (inputAccumulator * 10 + digit) % 3600
                             }
+                            bombSeconds = inputAccumulator.coerceAtLeast(1)
+                            c4Binding.tvTimer.text = String.format("%02d:%02d", bombSeconds / 60, bombSeconds % 60)
+                        }
+                    }
+                }
+
+                // Console adjustment buttons
+                consoleBinding.ivAddOneSecond.setOnClickListener {
+                    soundManager.playSound("weaponsound/bomb/bomb_virtual_btn.ogg")
+                    if (!isBombActive) {
+                        bombSeconds = (bombSeconds + 1).coerceAtMost(3599)
+                        inputAccumulator = bombSeconds
+                        c4Binding.tvTimer.text = String.format("%02d:%02d", bombSeconds / 60, bombSeconds % 60)
+                    }
+                }
+
+                consoleBinding.ivMinusOneSecond.setOnClickListener {
+                    soundManager.playSound("weaponsound/bomb/bomb_virtual_btn.ogg")
+                    if (!isBombActive && bombSeconds > 1) {
+                        bombSeconds = (bombSeconds - 1).coerceAtLeast(1)
+                        inputAccumulator = bombSeconds
+                        c4Binding.tvTimer.text = String.format("%02d:%02d", bombSeconds / 60, bombSeconds % 60)
+                    }
+                }
+
+                consoleBinding.ivAddOneMin.setOnClickListener {
+                    soundManager.playSound("weaponsound/bomb/bomb_virtual_btn.ogg")
+                    if (!isBombActive) {
+                        bombSeconds = (bombSeconds + 60).coerceAtMost(3599)
+                        inputAccumulator = bombSeconds
+                        c4Binding.tvTimer.text = String.format("%02d:%02d", bombSeconds / 60, bombSeconds % 60)
+                    }
+                }
+
+                consoleBinding.ivMinusOneMin.setOnClickListener {
+                    soundManager.playSound("weaponsound/bomb/bomb_virtual_btn.ogg")
+                    if (!isBombActive && bombSeconds > 60) {
+                        bombSeconds = (bombSeconds - 60).coerceAtLeast(1)
+                        inputAccumulator = bombSeconds
+                        c4Binding.tvTimer.text = String.format("%02d:%02d", bombSeconds / 60, bombSeconds % 60)
+                    }
+                }
+
+                consoleBinding.ivBgRefresh.setOnClickListener {
+                    soundManager.playSound("weaponsound/bomb/bomb_virtual_btn.ogg")
+                    bombTimer?.cancel()
+                    isBombActive = false
+                    bombSeconds = 5
+                    inputAccumulator = 5
+                    c4Binding.tvTimer.text = String.format("%02d:%02d", bombSeconds / 60, bombSeconds % 60)
+                }
+
+                // Confirm / Start Button at the bottom to trigger countdown
+                consoleBinding.ivBgStart.setOnClickListener {
+                    soundManager.playSound("weaponsound/bomb/bomb_btn.ogg")
+                    if (!isBombActive) {
+                        startBombCountdown(bombSeconds) { remaining ->
+                            c4Binding.tvTimer.text = String.format("%02d:%02d", remaining / 60, remaining % 60)
                         }
                     }
                 }

@@ -41,6 +41,15 @@ class WeaponUseActivity : AppCompatActivity() {
     private var isImmersive = false
     private val mainHandler = Handler(Looper.getMainLooper())
     private var autoFireRunnable: Runnable? = null
+    private var flameRunnable: Runnable? = null
+    private var flameFrameIndex = 0
+    private val flameDrawables = intArrayOf(
+        R.drawable.flame_stream_1,
+        R.drawable.flame_stream_2,
+        R.drawable.flame_stream_3,
+        R.drawable.flame_stream_4
+    )
+
     private var bombTimer: CountDownTimer? = null
     private var bombSeconds = 5
     private var isBombActive = false
@@ -91,6 +100,7 @@ class WeaponUseActivity : AppCompatActivity() {
         super.onPause()
         shakeDetector?.stop()
         stopAutoFire()
+        stopFlamethrower()
         flashManager.turnOff()
         vibrationManager.cancel()
         soundManager.stopLoopingSound()
@@ -116,8 +126,9 @@ class WeaponUseActivity : AppCompatActivity() {
         binding.flSpine.addView(weaponImageView)
 
         val density = resources.displayMetrics.density
-        val flashWidth = (90 * density).toInt()
-        val flashHeight = (150 * density).toInt()
+        val flashWidth = if (weapon.id == "flamethrower") (180 * density).toInt() else (90 * density).toInt()
+        val flashHeight = if (weapon.id == "flamethrower") (290 * density).toInt() else (150 * density).toInt()
+
         muzzleFlashImageView = ImageView(this).apply {
             layoutParams = FrameLayout.LayoutParams(flashWidth, flashHeight).apply {
                 gravity = Gravity.TOP or Gravity.START
@@ -169,7 +180,7 @@ class WeaponUseActivity : AppCompatActivity() {
 
             // Perfectly centered horizontally on the barrel tip, projecting straight upward
             muzzleFlashImageView.x = barrelTipX - (flashW / 2f)
-            muzzleFlashImageView.y = barrelTipY - (flashH * 0.85f)
+            muzzleFlashImageView.y = barrelTipY - (flashH * 0.88f)
         }
     }
 
@@ -200,7 +211,7 @@ class WeaponUseActivity : AppCompatActivity() {
             }
             WeaponType.MECHANICAL_GUN -> {
                 colorPickerBtn?.isVisible = false
-                gunEffectBtn?.isVisible = true
+                gunEffectBtn?.isVisible = weapon.id != "flamethrower"
                 shakeBtn?.isVisible = true
                 gunEffectBtn?.setOnClickListener {
                     soundManager.playButtonClick()
@@ -294,6 +305,8 @@ class WeaponUseActivity : AppCompatActivity() {
             MotionEvent.ACTION_DOWN -> {
                 if (weapon.type == WeaponType.TASER) {
                     startTaserShock()
+                } else if (weapon.id == "flamethrower") {
+                    startFlamethrower()
                 } else if (currentMode == FireMode.AUTO || weapon.magazineCapacity > 10) {
                     startAutoFire()
                 } else {
@@ -310,6 +323,8 @@ class WeaponUseActivity : AppCompatActivity() {
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                 if (weapon.type == WeaponType.TASER) {
                     stopTaserShock()
+                } else if (weapon.id == "flamethrower") {
+                    stopFlamethrower()
                 } else {
                     stopAutoFire()
                 }
@@ -329,6 +344,33 @@ class WeaponUseActivity : AppCompatActivity() {
         if (!isUnlimitedAmmo) {
             weapon.currentAmmo--
             updateAmmoDisplay()
+        }
+
+        // Special handling for M2 Flamethrower on tap/shake:
+        if (weapon.id == "flamethrower") {
+            soundManager.playSound("weaponsound/machine/fire.mp3")
+            flashManager.flashOnce(180L)
+            vibrationManager.vibrateShot(180L)
+
+            val density = resources.displayMetrics.density
+            muzzleFlashImageView.layoutParams = FrameLayout.LayoutParams((180 * density).toInt(), (290 * density).toInt())
+            updateMuzzleFlashPosition()
+            muzzleFlashImageView.setImageResource(R.drawable.flame_stream_1)
+            muzzleFlashImageView.visibility = View.VISIBLE
+
+            mainHandler.postDelayed({
+                muzzleFlashImageView.setImageResource(R.drawable.flame_stream_2)
+            }, 45L)
+            mainHandler.postDelayed({
+                muzzleFlashImageView.setImageResource(R.drawable.flame_stream_3)
+            }, 90L)
+            mainHandler.postDelayed({
+                muzzleFlashImageView.setImageResource(R.drawable.flame_stream_4)
+            }, 135L)
+            mainHandler.postDelayed({
+                muzzleFlashImageView.visibility = View.GONE
+            }, 180L)
+            return
         }
 
         // 1. Play Sound
@@ -358,6 +400,72 @@ class WeaponUseActivity : AppCompatActivity() {
             mainHandler.removeCallbacks(hideFlashRunnable)
             mainHandler.postDelayed(hideFlashRunnable, 45L)
         }
+    }
+
+    private fun startFlamethrower() {
+        if (weapon.currentAmmo <= 0 && !isUnlimitedAmmo) {
+            soundManager.playSound(weapon.emptySoundPath)
+            binding.groupReloadBullets.visibility = View.VISIBLE
+            return
+        }
+
+        isFiring = true
+        soundManager.startLoopingSound("weaponsound/machine/fire.mp3")
+        flashManager.turnOn()
+        vibrationManager.vibrateContinuous(5000L)
+
+        val density = resources.displayMetrics.density
+        val flameW = (180 * density).toInt()
+        val flameH = (290 * density).toInt()
+        muzzleFlashImageView.layoutParams = FrameLayout.LayoutParams(flameW, flameH)
+        muzzleFlashImageView.visibility = View.VISIBLE
+        updateMuzzleFlashPosition()
+
+        flameRunnable = object : Runnable {
+            override fun run() {
+                if (isFiring && (weapon.currentAmmo > 0 || isUnlimitedAmmo)) {
+                    if (!isUnlimitedAmmo) {
+                        weapon.currentAmmo = (weapon.currentAmmo - 1).coerceAtLeast(0)
+                        updateAmmoDisplay()
+                    }
+
+                    // Cycle flame animation frames
+                    muzzleFlashImageView.setImageResource(flameDrawables[flameFrameIndex % flameDrawables.size])
+                    muzzleFlashImageView.scaleX = (95..110).random() / 100f
+                    muzzleFlashImageView.scaleY = (95..110).random() / 100f
+                    flameFrameIndex++
+
+                    // Realistic flamethrower recoil tremor
+                    weaponImageView.translationX = (-3..3).random().toFloat()
+                    weaponImageView.translationY = (-2..4).random().toFloat()
+
+                    mainHandler.postDelayed(this, 50L)
+                } else {
+                    stopFlamethrower()
+                }
+            }
+        }
+        mainHandler.post(flameRunnable!!)
+    }
+
+    private fun stopFlamethrower() {
+        isFiring = false
+        flameRunnable?.let { mainHandler.removeCallbacks(it) }
+        flameRunnable = null
+
+        soundManager.stopLoopingSound()
+        flashManager.turnOff()
+        vibrationManager.cancel()
+
+        muzzleFlashImageView.visibility = View.GONE
+        weaponImageView.translationX = 0f
+        weaponImageView.translationY = 0f
+
+        val density = resources.displayMetrics.density
+        val flashWidth = (90 * density).toInt()
+        val flashHeight = (150 * density).toInt()
+        muzzleFlashImageView.layoutParams = FrameLayout.LayoutParams(flashWidth, flashHeight)
+        updateMuzzleFlashPosition()
     }
 
     private fun startAutoFire() {
@@ -433,7 +541,7 @@ class WeaponUseActivity : AppCompatActivity() {
         findViewById<View>(R.id.iv_setting)?.isVisible = !isImmersive
         findViewById<View>(R.id.iv_shake)?.isVisible = !isImmersive && (weapon.type != WeaponType.TIME_BOMB)
         findViewById<View>(R.id.iv_scene_menu)?.isVisible = !isImmersive
-        findViewById<View>(R.id.iv_gun_effect)?.isVisible = !isImmersive && (weapon.type == WeaponType.MECHANICAL_GUN)
+        findViewById<View>(R.id.iv_gun_effect)?.isVisible = !isImmersive && (weapon.type == WeaponType.MECHANICAL_GUN && weapon.id != "flamethrower")
         findViewById<View>(R.id.iv_unlimited_bullet)?.isVisible = !isImmersive
         findViewById<View>(R.id.iv_bullets)?.isVisible = !isImmersive
         findViewById<View>(R.id.tv_bullets_number_in_cartridge_clip)?.isVisible = !isImmersive && !isUnlimitedAmmo

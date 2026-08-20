@@ -1,12 +1,17 @@
 package com.example.gunsound.activity
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.PointF
 import android.graphics.PorterDuff
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Handler
 import android.os.Looper
+import android.view.animation.LinearInterpolator
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
@@ -23,8 +28,11 @@ import com.example.gunsound.dialog.AppDialogs
 import com.example.gunsound.model.FireMode
 import com.example.gunsound.model.Weapon
 import com.example.gunsound.model.WeaponType
+import android.net.Uri
 import com.example.gunsound.repository.WeaponRepository
 import com.example.gunsound.utils.*
+import com.example.gunsound.views.ElectricArcView
+import kotlin.random.Random
 
 class WeaponUseActivity : AppCompatActivity() {
 
@@ -57,6 +65,12 @@ class WeaponUseActivity : AppCompatActivity() {
 
     private lateinit var weaponImageView: ImageView
     private lateinit var muzzleFlashImageView: ImageView
+    private lateinit var electricArcView: ElectricArcView
+    private var taserJitterRunnable: Runnable? = null
+    private var isBladeExtended = true
+    private var lastTouchX = 0f
+    private var lastTouchY = 0f
+    private var lightsaberJitterRunnable: Runnable? = null
     private val hideFlashRunnable = Runnable {
         if (::muzzleFlashImageView.isInitialized) {
             muzzleFlashImageView.visibility = View.GONE
@@ -102,6 +116,7 @@ class WeaponUseActivity : AppCompatActivity() {
         shakeDetector?.stop()
         stopAutoFire()
         stopFlamethrower()
+        stopTaserShock()
         flashManager.turnOff()
         vibrationManager.cancel()
         soundManager.stopLoopingSound()
@@ -110,6 +125,8 @@ class WeaponUseActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        stopTaserShock()
+        stopLightsaberTouch()
         bombTimer?.cancel()
         flashManager.release()
         mainHandler.removeCallbacks(hideFlashRunnable)
@@ -122,7 +139,12 @@ class WeaponUseActivity : AppCompatActivity() {
                 FrameLayout.LayoutParams.MATCH_PARENT
             )
             scaleType = ImageView.ScaleType.FIT_CENTER
-            setImageResource(weapon.showPicRes)
+            setImageResource(
+                if (weapon.id.contains("rpg") && weapon.currentAmmo <= 0 && !isUnlimitedAmmo)
+                    R.drawable.rpg_barrel_empty
+                else
+                    weapon.showPicRes
+            )
         }
         binding.flSpine.addView(weaponImageView)
 
@@ -138,6 +160,15 @@ class WeaponUseActivity : AppCompatActivity() {
             visibility = View.GONE
         }
         binding.flSpine.addView(muzzleFlashImageView)
+
+        electricArcView = ElectricArcView(this).apply {
+            layoutParams = FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT
+            )
+            visibility = View.GONE
+        }
+        binding.flSpine.addView(electricArcView)
 
         weaponImageView.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
             updateMuzzleFlashPosition()
@@ -196,14 +227,29 @@ class WeaponUseActivity : AppCompatActivity() {
         when (weapon.type) {
             WeaponType.LIGHTSABER -> {
                 colorPickerBtn?.isVisible = true
-                gunEffectBtn?.isVisible = false
+                gunEffectBtn?.isVisible = true
                 shakeBtn?.isVisible = true
                 colorPickerBtn?.setOnClickListener {
                     soundManager.playButtonClick()
                     colorPickerCon?.isVisible = !(colorPickerCon.isVisible)
                 }
+                gunEffectBtn?.setOnClickListener {
+                    soundManager.playButtonClick()
+                    AppDialogs.showLightSaberEffectDialog(this) { effect ->
+                        flashManager.flashOnce(50L)
+                        vibrationManager.vibrateShot(60L)
+                        soundManager.playSound("weaponsound/lightsaber/light_saber_shoot.ogg")
+                        weaponImageView.animate()
+                            .scaleX(1.08f)
+                            .scaleY(1.08f)
+                            .setDuration(120)
+                            .withEndAction {
+                                weaponImageView.animate().scaleX(1.0f).scaleY(1.0f).setDuration(120).start()
+                            }.start()
+                    }
+                }
                 colorSeekBar?.onColorChangeListener = { color ->
-                    weaponImageView.setColorFilter(color, PorterDuff.Mode.MULTIPLY)
+                    weaponImageView.setColorFilter(color, PorterDuff.Mode.SRC_ATOP)
                 }
                 resetColorBtn?.setOnClickListener {
                     soundManager.playButtonClick()
@@ -295,7 +341,13 @@ class WeaponUseActivity : AppCompatActivity() {
 
     private fun setupShakeDetector() {
         shakeDetector = ShakeDetector(this) {
-            onWeaponTriggered(fromShake = true)
+            if (weapon.type == WeaponType.LIGHTSABER) {
+                if (AppPreferences.get(this).isShakeSoundEnabled) {
+                    triggerLightsaberSwing()
+                }
+            } else {
+                onWeaponTriggered(fromShake = true)
+            }
         }
     }
 
@@ -304,7 +356,9 @@ class WeaponUseActivity : AppCompatActivity() {
 
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
-                if (weapon.type == WeaponType.TASER) {
+                if (weapon.type == WeaponType.LIGHTSABER) {
+                    startLightsaberTouch(event)
+                } else if (weapon.type == WeaponType.TASER) {
                     startTaserShock()
                 } else if (weapon.id == "flamethrower") {
                     startFlamethrower()
@@ -317,12 +371,14 @@ class WeaponUseActivity : AppCompatActivity() {
             }
             MotionEvent.ACTION_MOVE -> {
                 if (weapon.type == WeaponType.LIGHTSABER) {
-                    soundManager.playSound("weaponsound/lightsaber/light_saber_shake.ogg")
+                    handleLightsaberMove(event)
                 }
                 return true
             }
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                if (weapon.type == WeaponType.TASER) {
+                if (weapon.type == WeaponType.LIGHTSABER) {
+                    stopLightsaberTouch()
+                } else if (weapon.type == WeaponType.TASER) {
                     stopTaserShock()
                 } else if (weapon.id == "flamethrower") {
                     stopFlamethrower()
@@ -374,6 +430,61 @@ class WeaponUseActivity : AppCompatActivity() {
             return
         }
 
+        // Special handling for Taser on tap / shake (hiệu ứng tia điện):
+        if (weapon.type == WeaponType.TASER) {
+            soundManager.playSound(weapon.shootSoundPath)
+            flashManager.flashOnce(220L)
+            vibrationManager.vibrateShot(220L)
+
+            val (p1, p2) = getTaserProngCoords()
+            if (p1.x > 0f) {
+                if (weapon.id == "taser_5") {
+                    val targetX = p1.x + (Random.nextFloat() * 30f - 15f) * resources.displayMetrics.density
+                    val targetY = p1.y - (140 * resources.displayMetrics.density)
+                    electricArcView.startShock(p1.x, p1.y, targetX, targetY, straight = true)
+                } else {
+                    electricArcView.startShock(p1.x, p1.y, p2.x, p2.y, straight = false)
+                }
+            }
+
+            weaponImageView.translationX = (Random.nextFloat() * 8f - 4f)
+            weaponImageView.translationY = (Random.nextFloat() * 8f - 4f)
+
+            mainHandler.postDelayed({
+                electricArcView.stopShock()
+                weaponImageView.translationX = 0f
+                weaponImageView.translationY = 0f
+            }, 250L)
+            return
+        }
+
+        // Special handling for RPG-7 Rocket Launch:
+        if (weapon.id.contains("rpg")) {
+            soundManager.playSound("weaponsound/machine/rpg.MP3")
+            flashManager.flashOnce(100L)
+            vibrationManager.vibrateHeavyExplosion()
+
+            // Recoil launcher downward
+            weaponImageView.translationY = 32f
+            weaponImageView.animate().translationY(0f).setDuration(120).start()
+
+            // Show empty launcher tube immediately
+            weaponImageView.setImageResource(R.drawable.rpg_barrel_empty)
+
+            // Spawn and launch rocket projectile upwards
+            spawnAndLaunchRpgRocket()
+
+            // Muzzle flash & smoke at barrel top
+            val prefs = AppPreferences.get(this)
+            val effectIndex = prefs.currentFiringEffectIndex
+            val effect = WeaponRepository.shootEffects.getOrNull(effectIndex) ?: WeaponRepository.shootEffects.first()
+            muzzleFlashImageView.setImageResource(effect.effectDrawableRes)
+            muzzleFlashImageView.visibility = View.VISIBLE
+            mainHandler.removeCallbacks(hideFlashRunnable)
+            mainHandler.postDelayed(hideFlashRunnable, 140L)
+            return
+        }
+
         // 1. Play Sound
         if (weapon.shootSoundPath.isNotEmpty()) {
             soundManager.playSound(weapon.shootSoundPath)
@@ -400,7 +511,38 @@ class WeaponUseActivity : AppCompatActivity() {
 
             mainHandler.removeCallbacks(hideFlashRunnable)
             mainHandler.postDelayed(hideFlashRunnable, 45L)
+
+            // Sci-Fi Arc Electric Discharge
+            if (weapon.id.startsWith("sci_arc")) {
+                val drawable = weaponImageView.drawable
+                if (drawable != null) {
+                    val dWidth = drawable.intrinsicWidth.toFloat()
+                    val dHeight = drawable.intrinsicHeight.toFloat()
+                    val vWidth = weaponImageView.width.toFloat()
+                    val vHeight = weaponImageView.height.toFloat()
+                    if (dWidth > 0f && dHeight > 0f && vWidth > 0f && vHeight > 0f) {
+                        val scale = minOf(vWidth / dWidth, vHeight / dHeight)
+                        val renderedWidth = dWidth * scale
+                        val renderedHeight = dHeight * scale
+                        val offsetX = (vWidth - renderedWidth) / 2f
+                        val offsetY = (vHeight - renderedHeight) / 2f
+
+                        val muzzleX = offsetX + renderedWidth * weapon.muzzleXPercent
+                        val muzzleY = offsetY + renderedHeight * weapon.muzzleYPercent
+                        val targetX = muzzleX + (Random.nextFloat() * 50f - 25f) * resources.displayMetrics.density
+                        val targetY = muzzleY - (130 * resources.displayMetrics.density)
+
+                        electricArcView.startShock(muzzleX, muzzleY, targetX, targetY)
+                        mainHandler.postDelayed({
+                            electricArcView.stopShock()
+                        }, 130L)
+                    }
+                }
+            }
         }
+
+        // 5. Bullet Drop Effect
+        spawnBulletDrop()
     }
 
     private fun startFlamethrower() {
@@ -491,18 +633,290 @@ class WeaponUseActivity : AppCompatActivity() {
         autoFireRunnable = null
     }
 
+    private fun getTaserProngCoords(): Pair<PointF, PointF> {
+        val drawable = weaponImageView.drawable ?: return Pair(PointF(0f, 0f), PointF(0f, 0f))
+        val dWidth = drawable.intrinsicWidth.toFloat()
+        val dHeight = drawable.intrinsicHeight.toFloat()
+        val vWidth = weaponImageView.width.toFloat()
+        val vHeight = weaponImageView.height.toFloat()
+        if (dWidth <= 0f || dHeight <= 0f || vWidth <= 0f || vHeight <= 0f) {
+            return Pair(PointF(0f, 0f), PointF(0f, 0f))
+        }
+        val scale = minOf(vWidth / dWidth, vHeight / dHeight)
+        val renderedWidth = dWidth * scale
+        val renderedHeight = dHeight * scale
+        val offsetX = (vWidth - renderedWidth) / 2f
+        val offsetY = (vHeight - renderedHeight) / 2f
+
+        val (pLeftRel, pRightRel, pYRel) = when (weapon.id) {
+            "taser_1" -> Triple(0.3204f, 0.6120f, 0.2607f)
+            "taser_2" -> Triple(0.3269f, 0.6722f, 0.2142f)
+            "taser_3" -> Triple(0.4602f, 0.6519f, 0.2057f)
+            "taser_4" -> Triple(0.3497f, 0.6494f, 0.1476f)
+            "taser_5" -> Triple(0.5600f, 0.5600f, 0.1773f) // Ảnh 2: Đầu nòng phóng thẳng
+            "taser_6" -> Triple(0.5056f, 0.6648f, 0.1797f)
+            "taser_7" -> Triple(0.3778f, 0.7194f, 0.2051f)
+            "taser_8" -> Triple(0.4056f, 0.5907f, 0.1446f)
+            else -> Triple(0.35f, 0.65f, 0.20f)
+        }
+
+        val p1 = PointF(offsetX + renderedWidth * pLeftRel, offsetY + renderedHeight * pYRel)
+        val p2 = PointF(offsetX + renderedWidth * pRightRel, offsetY + renderedHeight * pYRel)
+        return Pair(p1, p2)
+    }
+
+    private fun spawnBulletDrop() {
+        if (!AppPreferences.get(this).isBulletDropEnabled) return
+        if (weapon.isBomb || weapon.type == WeaponType.LIGHTSABER || weapon.type == WeaponType.TASER) return
+        if (weapon.id.contains("flamethrower") || weapon.id.contains("rpg") || weapon.id.contains("m84")) return
+
+        val container = binding.flSpine
+        val drawable = weaponImageView.drawable ?: return
+        val dWidth = drawable.intrinsicWidth.toFloat()
+        val dHeight = drawable.intrinsicHeight.toFloat()
+        val vWidth = weaponImageView.width.toFloat()
+        val vHeight = weaponImageView.height.toFloat()
+        if (dWidth <= 0f || dHeight <= 0f || vWidth <= 0f || vHeight <= 0f) return
+
+        val scale = minOf(vWidth / dWidth, vHeight / dHeight)
+        val renderedWidth = dWidth * scale
+        val renderedHeight = dHeight * scale
+        val offsetX = (vWidth - renderedWidth) / 2f
+        val offsetY = (vHeight - renderedHeight) / 2f
+
+        val density = resources.displayMetrics.density
+        val startX = offsetX + renderedWidth * 0.48f + (Random.nextFloat() * 16f - 8f) * density
+        val startY = offsetY + renderedHeight * 0.44f
+
+        val bullet = ImageView(this).apply {
+            setImageResource(R.drawable.machine_bullet)
+            layoutParams = FrameLayout.LayoutParams(
+                (14 * density).toInt(),
+                (34 * density).toInt()
+            )
+            x = startX
+            y = startY
+            rotation = Random.nextFloat() * 30f - 15f
+        }
+
+        container.addView(bullet)
+
+        val shootUp = (Random.nextFloat() * 70f + 60f) * density
+        val travelX = (Random.nextFloat() * 95f + 70f) * (if (Random.nextBoolean()) 1 else -1) * density
+        val fallDown = (Random.nextFloat() * 300f + 250f) * density
+        val totalRotation = (Random.nextFloat() * 360f + 360f) * (if (travelX > 0) 1 else -1)
+
+        val animator = ValueAnimator.ofFloat(0f, 1f).apply {
+            duration = Random.nextLong(480L, 620L)
+            interpolator = LinearInterpolator()
+            addUpdateListener { va ->
+                val t = va.animatedFraction
+                val curX = startX + travelX * t
+                val curY = startY - shootUp * (4f * t * (1f - t).coerceAtLeast(0f)) + fallDown * (t * t)
+                bullet.x = curX
+                bullet.y = curY
+                bullet.rotation = t * totalRotation
+                if (t > 0.60f) {
+                    bullet.alpha = ((1f - t) / 0.40f).coerceIn(0f, 1f)
+                }
+            }
+            addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    container.removeView(bullet)
+                }
+            })
+        }
+        animator.start()
+    }
+
+    private fun spawnAndLaunchRpgRocket() {
+        val dWidth = 1080f
+        val dHeight = 1653f
+        val vWidth = weaponImageView.width.toFloat()
+        val vHeight = weaponImageView.height.toFloat()
+        if (vWidth <= 0f || vHeight <= 0f) return
+
+        val scale = minOf(vWidth / dWidth, vHeight / dHeight)
+        val renderedWidth = dWidth * scale
+        val renderedHeight = dHeight * scale
+        val offsetX = (vWidth - renderedWidth) / 2f
+        val offsetY = (vHeight - renderedHeight) / 2f
+
+        val rocketW = renderedWidth.toInt()
+        val rocketH = (renderedHeight * 0.335f).toInt()
+
+        val rocket = ImageView(this).apply {
+            setImageResource(R.drawable.rpg_rocket)
+            layoutParams = FrameLayout.LayoutParams(rocketW, rocketH)
+            x = offsetX
+            y = offsetY
+        }
+
+        binding.flSpine.addView(rocket)
+
+        val flyDistance = resources.displayMetrics.heightPixels.toFloat() * 1.5f
+        rocket.animate()
+            .translationY(-flyDistance)
+            .setDuration(320L)
+            .setInterpolator(android.view.animation.AccelerateInterpolator(2.2f))
+            .withEndAction {
+                binding.flSpine.removeView(rocket)
+            }
+            .start()
+    }
+
     private fun startTaserShock() {
         soundManager.startLoopingSound(weapon.shootSoundPath)
         flashManager.turnOn()
         vibrationManager.vibrateContinuous(5000L)
-        weaponImageView.animate().scaleX(1.05f).scaleY(1.05f).setDuration(100).start()
+
+        weaponImageView.post {
+            val (p1, p2) = getTaserProngCoords()
+            if (p1.x > 0f) {
+                if (weapon.id == "taser_5") {
+                    val targetX = p1.x + (Random.nextFloat() * 30f - 15f) * resources.displayMetrics.density
+                    val targetY = p1.y - (140 * resources.displayMetrics.density)
+                    electricArcView.startShock(p1.x, p1.y, targetX, targetY, straight = true)
+                } else {
+                    electricArcView.startShock(p1.x, p1.y, p2.x, p2.y, straight = false)
+                }
+            }
+        }
+
+        taserJitterRunnable = object : Runnable {
+            override fun run() {
+                if (::electricArcView.isInitialized && electricArcView.visibility == View.VISIBLE) {
+                    weaponImageView.translationX = (Random.nextFloat() * 6f - 3f)
+                    weaponImageView.translationY = (Random.nextFloat() * 6f - 3f)
+                    mainHandler.postDelayed(this, 30L)
+                }
+            }
+        }
+        mainHandler.post(taserJitterRunnable!!)
     }
 
     private fun stopTaserShock() {
         soundManager.stopLoopingSound()
         flashManager.turnOff()
         vibrationManager.cancel()
-        weaponImageView.animate().scaleX(1.0f).scaleY(1.0f).setDuration(100).start()
+        if (::electricArcView.isInitialized) {
+            electricArcView.stopShock()
+        }
+        taserJitterRunnable?.let { mainHandler.removeCallbacks(it) }
+        taserJitterRunnable = null
+        if (::weaponImageView.isInitialized) {
+            weaponImageView.translationX = 0f
+            weaponImageView.translationY = 0f
+        }
+    }
+
+    private fun triggerLightsaberSwing() {
+        if (!isBladeExtended) return
+        soundManager.playSound("weaponsound/lightsaber/light_saber_shake.ogg")
+        vibrationManager.vibrateShot(60L)
+        flashManager.flashOnce(40L)
+        val tilt = if (Random.nextBoolean()) 8f else -8f
+        weaponImageView.animate()
+            .rotation(tilt)
+            .translationX((Random.nextFloat() * 16f - 8f))
+            .setDuration(100)
+            .withEndAction {
+                weaponImageView.animate()
+                    .rotation(0f)
+                    .translationX(0f)
+                    .setDuration(120)
+                    .start()
+            }.start()
+    }
+
+    private fun startLightsaberTouch(event: MotionEvent) {
+        lastTouchX = event.x
+        lastTouchY = event.y
+
+        findViewById<View>(R.id.con_color_choose)?.visibility = View.GONE
+
+        if (!isBladeExtended) {
+            extendLightsaberBlade()
+            return
+        }
+
+        soundManager.playSound("weaponsound/lightsaber/light_saber_shake.ogg")
+        flashManager.flashOnce(40L)
+        vibrationManager.vibrateShot(50L)
+
+        lightsaberJitterRunnable?.let { mainHandler.removeCallbacks(it) }
+        lightsaberJitterRunnable = object : Runnable {
+            override fun run() {
+                if (weapon.type == WeaponType.LIGHTSABER && isBladeExtended) {
+                    weaponImageView.translationX = (Random.nextFloat() * 6f - 3f)
+                    weaponImageView.translationY = (Random.nextFloat() * 6f - 3f)
+                    mainHandler.postDelayed(this, 35L)
+                }
+            }
+        }
+        mainHandler.post(lightsaberJitterRunnable!!)
+    }
+
+    private fun handleLightsaberMove(event: MotionEvent) {
+        if (!isBladeExtended) return
+        val dx = event.x - lastTouchX
+        val dy = event.y - lastTouchY
+        val dist = kotlin.math.sqrt(dx * dx + dy * dy)
+        if (dist > 30f) {
+            lastTouchX = event.x
+            lastTouchY = event.y
+            soundManager.playSound("weaponsound/lightsaber/light_saber_shake.ogg")
+            vibrationManager.vibrateShot(40L)
+            val angle = (dx / 30f).coerceIn(-12f, 12f)
+            weaponImageView.animate().rotation(angle).setDuration(80).withEndAction {
+                weaponImageView.animate().rotation(0f).setDuration(100).start()
+            }.start()
+        }
+    }
+
+    private fun stopLightsaberTouch() {
+        lightsaberJitterRunnable?.let { mainHandler.removeCallbacks(it) }
+        lightsaberJitterRunnable = null
+        if (::weaponImageView.isInitialized) {
+            weaponImageView.translationX = 0f
+            weaponImageView.translationY = 0f
+            weaponImageView.rotation = 0f
+        }
+    }
+
+    private fun retractLightsaberBlade() {
+        isBladeExtended = false
+        soundManager.playSound("weaponsound/lightsaber/light_saber_return.ogg")
+        soundManager.stopLoopingSound()
+        vibrationManager.vibrateShot(50L)
+        weaponImageView.animate()
+            .scaleX(0.08f)
+            .scaleY(0.08f)
+            .alpha(0.35f)
+            .setDuration(220)
+            .setInterpolator(android.view.animation.AccelerateInterpolator())
+            .withEndAction {
+                isReloading = false
+            }
+            .start()
+    }
+
+    private fun extendLightsaberBlade() {
+        isBladeExtended = true
+        soundManager.playSound("weaponsound/lightsaber/light_saber_shoot.ogg")
+        soundManager.startLoopingSound("weaponsound/lightsaber/light_saber_circle_default.ogg")
+        flashManager.flashOnce(60L)
+        vibrationManager.vibrateShot(80L)
+        weaponImageView.animate()
+            .scaleX(1.0f)
+            .scaleY(1.0f)
+            .alpha(1.0f)
+            .setDuration(280)
+            .setInterpolator(android.view.animation.OvershootInterpolator(1.8f))
+            .withEndAction {
+                isReloading = false
+            }
+            .start()
     }
 
     private fun performReload() {
@@ -523,25 +937,12 @@ class WeaponUseActivity : AppCompatActivity() {
 
         when (weapon.type) {
             WeaponType.LIGHTSABER -> {
-                // Lightsaber Retract & Energy Burst Extension
-                vibrationManager.vibrateShot(50L)
-                weaponImageView.animate()
-                    .scaleY(0.15f)
-                    .alpha(0.6f)
-                    .setDuration(220)
-                    .withEndAction {
-                        refillAmmoAction()
-                        vibrationManager.vibrateShot(80L)
-                        soundManager.playSound("weaponsound/lightsaber/light_saber_shoot.ogg")
-                        weaponImageView.animate()
-                            .scaleY(1.05f)
-                            .alpha(1.0f)
-                            .setDuration(260)
-                            .withEndAction {
-                                weaponImageView.animate().scaleY(1.0f).setDuration(100).start()
-                                isReloading = false
-                            }.start()
-                    }.start()
+                refillAmmoAction()
+                if (isBladeExtended) {
+                    retractLightsaberBlade()
+                } else {
+                    extendLightsaberBlade()
+                }
             }
             WeaponType.TASER -> {
                 // Taser cartridge eject and slap in
@@ -569,6 +970,53 @@ class WeaponUseActivity : AppCompatActivity() {
                     }.start()
             }
             else -> {
+                if (weapon.id.contains("rpg")) {
+                    // RPG-7 Rocket Reload Animation: Rocket slides from above down into the tube
+                    val dWidth = 1080f
+                    val dHeight = 1653f
+                    val vWidth = weaponImageView.width.toFloat()
+                    val vHeight = weaponImageView.height.toFloat()
+                    val scale = if (vWidth > 0f && vHeight > 0f) minOf(vWidth / dWidth, vHeight / dHeight) else 1f
+                    val renderedWidth = dWidth * scale
+                    val renderedHeight = dHeight * scale
+                    val offsetX = (vWidth - renderedWidth) / 2f
+                    val offsetY = (vHeight - renderedHeight) / 2f
+
+                    val rocketW = renderedWidth.toInt()
+                    val rocketH = (renderedHeight * 0.335f).toInt()
+
+                    val rocket = ImageView(this).apply {
+                        setImageResource(R.drawable.rpg_rocket)
+                        layoutParams = FrameLayout.LayoutParams(rocketW, rocketH)
+                        x = offsetX
+                        y = offsetY - (420 * resources.displayMetrics.density)
+                        alpha = 0f
+                    }
+
+                    binding.flSpine.addView(rocket)
+                    soundManager.playSound("weaponsound/machine/reload_bullets.mp3")
+
+                    rocket.animate()
+                        .translationY(offsetY)
+                        .alpha(1.0f)
+                        .setDuration(560L)
+                        .setInterpolator(android.view.animation.DecelerateInterpolator(1.5f))
+                        .withEndAction {
+                            vibrationManager.vibrateShot(60L)
+                            weaponImageView.setImageResource(R.drawable.pic_weapon_show_rpg_7)
+                            weaponImageView.animate()
+                                .translationY(14f)
+                                .setDuration(70)
+                                .withEndAction {
+                                    weaponImageView.animate().translationY(0f).setDuration(90).start()
+                                }.start()
+                            binding.flSpine.removeView(rocket)
+                            refillAmmoAction()
+                            isReloading = false
+                        }.start()
+                    return
+                }
+
                 // Mechanical & Sci-Fi Guns: Multi-phase realistic magazine drop, slap in, and slide rack
                 // Phase 1: Magazine Drop & Weapon Tilt Down
                 vibrationManager.vibrateShot(40L)
@@ -859,19 +1307,60 @@ class WeaponUseActivity : AppCompatActivity() {
         }.start()
     }
 
+    private val dismissExplosionRunnable = Runnable {
+        dismissExplosion()
+    }
+
     private fun detonateBomb() {
         isBombActive = false
         soundManager.playSound(weapon.shootSoundPath)
         vibrationManager.vibrateHeavyExplosion()
-        flashManager.flashStrobe(5, 50L)
+        flashManager.flashStrobe(8, 40L)
 
-        // Screen crack prank effect
-        binding.ivBoom.setImageResource(R.drawable.bomb_break)
-        binding.ivBoom.visibility = View.VISIBLE
-        soundManager.playSound("weaponsound/bomb/broken_screen.ogg")
+        // Select explosion fire video matching bomb type or conventional explosion
+        val explosionVideoRes = when (weapon.id) {
+            "bomb_nuclear" -> R.raw.bomb_effect_nuclear
+            "bomb_frostbite" -> R.raw.bomb_effect_frostbite
+            "bomb_gas" -> R.raw.bomb_effect_gas
+            "bomb_skibidi" -> R.raw.bomb_effect_skibidi
+            "bomb_stone" -> R.raw.bomb_effect_stone_age
+            else -> R.raw.conventional_explosion
+        }
 
-        mainHandler.postDelayed({
-            binding.ivBoom.visibility = View.GONE
-        }, 3500L)
+        try {
+            val uri = Uri.parse("android.resource://$packageName/$explosionVideoRes")
+            binding.videoView.setVideoURI(uri)
+            binding.videoView.bringToFront()
+            binding.videoView.visibility = View.VISIBLE
+            binding.videoView.setOnPreparedListener { mp ->
+                mp.isLooping = false
+                binding.videoView.start()
+            }
+            binding.videoView.setOnCompletionListener {
+                dismissExplosion()
+            }
+        } catch (e: Exception) {
+            dismissExplosion()
+        }
+
+        // Full screen fire engulfs for ~2 seconds then returns back to screen
+        mainHandler.removeCallbacks(dismissExplosionRunnable)
+        mainHandler.postDelayed(dismissExplosionRunnable, 2000L)
+    }
+
+    private fun dismissExplosion() {
+        mainHandler.removeCallbacks(dismissExplosionRunnable)
+        try {
+            if (binding.videoView.isPlaying) {
+                binding.videoView.stopPlayback()
+            }
+        } catch (e: Exception) {}
+        binding.videoView.visibility = View.GONE
+
+        // Reset bomb timer UI back to normal
+        bombSeconds = 5
+        isBombActive = false
+        val tvTimer = findViewById<TextView>(R.id.tv_timer)
+        tvTimer?.let { updateNormalBombTimerText(it) }
     }
 }

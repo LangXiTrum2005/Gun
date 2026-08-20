@@ -142,6 +142,70 @@ object AppDialogs {
         dialog.show()
     }
 
+    fun showLightSaberEffectDialog(
+        context: Context,
+        onEffectSelected: (ShootEffect) -> Unit
+    ) {
+        val dialog = Dialog(context, R.style.myDialog)
+        val binding = DialogChangeLightSaberEffectBinding.inflate(LayoutInflater.from(context))
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(binding.root)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.window?.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+
+        val prefs = AppPreferences.get(context)
+        var selectedIndex = prefs.currentFiringEffectIndex.coerceIn(0, WeaponRepository.lightsaberEffects.size - 1)
+        val effects = WeaponRepository.lightsaberEffects
+
+        binding.rvEffectChoose.layoutManager =
+            androidx.recyclerview.widget.GridLayoutManager(context, 2)
+
+        class SaberEffectAdapter : RecyclerView.Adapter<SaberEffectAdapter.ViewHolder>() {
+            inner class ViewHolder(val itemBinding: ItemRvLightSaberEffectLayoutBinding) :
+                RecyclerView.ViewHolder(itemBinding.root)
+
+            override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+                val b = ItemRvLightSaberEffectLayoutBinding.inflate(
+                    LayoutInflater.from(parent.context), parent, false
+                )
+                return ViewHolder(b)
+            }
+
+            override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+                val effect = effects[position]
+                holder.itemBinding.ivEffect.setImageResource(effect.previewDrawableRes)
+                holder.itemBinding.groupSelected.visibility =
+                    if (position == selectedIndex) android.view.View.VISIBLE else android.view.View.GONE
+
+                holder.itemBinding.root.setOnClickListener {
+                    SoundManager.get(context).playButtonClick()
+                    selectedIndex = position
+                    notifyDataSetChanged()
+                    prefs.currentFiringEffectIndex = selectedIndex
+                    onEffectSelected(effects[selectedIndex])
+                    dialog.dismiss()
+                }
+            }
+
+            override fun getItemCount(): Int = effects.size
+        }
+
+        binding.rvEffectChoose.adapter = SaberEffectAdapter()
+
+        binding.ivCloseDialog.setOnClickListener {
+            SoundManager.get(context).playButtonClick()
+            dialog.dismiss()
+        }
+        binding.rootBg.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+    }
+
     fun showShakeSensitivityDialog(context: Context) {
         val dialog = Dialog(context, R.style.myDialog)
         val binding = DialogShakeSensitivityBinding.inflate(LayoutInflater.from(context))
@@ -166,6 +230,54 @@ object AppDialogs {
 
         binding.ivCloseDialog.setOnClickListener {
             SoundManager.get(context).playButtonClick()
+            dialog.dismiss()
+        }
+
+        dialog.show()
+    }
+
+    fun showRateDialog(context: Context) {
+        val dialog = Dialog(context, R.style.myDialog)
+        val binding = DialogRateUsBinding.inflate(LayoutInflater.from(context))
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(binding.root)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.window?.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
+
+        var selectedRating = 5
+        binding.ratingBar.rating = 5f
+        binding.tvRate.isEnabled = true
+        binding.ivLogo.setImageResource(R.drawable.pic_five_star)
+
+        binding.ratingBar.setOnRatingBarChangeListener { _, rating, _ ->
+            selectedRating = rating.toInt().coerceIn(0, 5)
+            binding.tvRate.isEnabled = selectedRating > 0
+            when (selectedRating) {
+                0 -> binding.ivLogo.setImageResource(R.drawable.pic_zero_star)
+                1 -> binding.ivLogo.setImageResource(R.drawable.pic_one_star)
+                2 -> binding.ivLogo.setImageResource(R.drawable.pic_two_star)
+                3 -> binding.ivLogo.setImageResource(R.drawable.pic_three_star)
+                4 -> binding.ivLogo.setImageResource(R.drawable.pic_four_star)
+                5 -> binding.ivLogo.setImageResource(R.drawable.pic_five_star)
+            }
+        }
+
+        binding.tvRate.setOnClickListener {
+            SoundManager.get(context).playButtonClick()
+            if (selectedRating >= 4) {
+                try {
+                    context.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("market://details?id=${context.packageName}")))
+                } catch (e: Exception) {
+                    context.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("https://play.google.com/store/apps/details?id=${context.packageName}")))
+                }
+            }
+            dialog.dismiss()
+        }
+
+        binding.rootBg.setOnClickListener {
             dialog.dismiss()
         }
 

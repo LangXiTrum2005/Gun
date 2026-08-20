@@ -40,6 +40,10 @@ class AppPreferences(context: Context) {
         get() = prefs.getBoolean(KEY_BTN_SOUND, true)
         set(value) = prefs.edit().putBoolean(KEY_BTN_SOUND, value).apply()
 
+    var isShakeSoundEnabled: Boolean
+        get() = prefs.getBoolean(KEY_SHAKE_SOUND, true)
+        set(value) = prefs.edit().putBoolean(KEY_SHAKE_SOUND, value).apply()
+
     var shakeSensitivity: Int
         get() = prefs.getInt(KEY_SHAKE_SENSITIVITY, 50)
         set(value) = prefs.edit().putInt(KEY_SHAKE_SENSITIVITY, value).apply()
@@ -61,6 +65,7 @@ class AppPreferences(context: Context) {
         private const val KEY_GUN_EFFECT = "key_gun_effect"
         private const val KEY_BGM = "key_bgm"
         private const val KEY_BTN_SOUND = "key_btn_sound"
+        private const val KEY_SHAKE_SOUND = "key_shake_sound"
         private const val KEY_SHAKE_SENSITIVITY = "key_shake_sensitivity"
         private const val KEY_BG_INDEX = "key_bg_index"
         private const val KEY_EFFECT_INDEX = "key_effect_index"

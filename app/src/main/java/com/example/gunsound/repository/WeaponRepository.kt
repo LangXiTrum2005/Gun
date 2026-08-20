@@ -74,6 +74,15 @@ object WeaponRepository {
         ShootEffect(5, R.string.Buckshot, R.drawable.shoot_effect_buckshot, "Buckshot", R.drawable.effect_buckshot)
     )
 
+    val lightsaberEffects: List<ShootEffect> = listOf(
+        ShootEffect(0, R.string.Standard, R.drawable.light_saber_jichu, "jichu", R.drawable.light_saber_jichu),
+        ShootEffect(1, R.string.Incendiary, R.drawable.light_saber_fire, "fire", R.drawable.light_saber_fire),
+        ShootEffect(2, R.string.Anime, R.drawable.light_saber_shandian, "shandian", R.drawable.light_saber_shandian),
+        ShootEffect(3, R.string.Tracer, R.drawable.light_saber_lizi, "lizi", R.drawable.light_saber_lizi),
+        ShootEffect(4, R.string.Buckshot, R.drawable.light_saber_huoxing, "xunhuan_huoxing", R.drawable.light_saber_huoxing),
+        ShootEffect(5, R.string.Poison, R.drawable.light_saber_shensheng, "shensheng", R.drawable.light_saber_shensheng)
+    )
+
     val mechanicalGuns: List<Weapon> = listOf(
         Weapon("ak47", R.string.weapon_name_ak47, WeaponType.MECHANICAL_GUN, R.drawable.pic_weapon_show_ak47, R.drawable.gun_machine_ak47, 30, 2, 100L, "weaponsound/machine/gun_ak47_shoot.MP3", "weaponsound/machine/gun_ak47_reload.MP3", muzzleXPercent = 0.5519f, muzzleYPercent = 0.1031f),
         Weapon("ak47_r", R.string.weapon_name_ak47_r, WeaponType.MECHANICAL_GUN, R.drawable.pic_weapon_show_ak47_r, R.drawable.gun_machine_ak47_r, 30, 2, 100L, "weaponsound/machine/gun_ak47_shoot.MP3", "weaponsound/machine/gun_ak47_reload.MP3", muzzleXPercent = 0.5583f, muzzleYPercent = 0.1101f),
@@ -120,7 +129,21 @@ object WeaponRepository {
             11 -> R.string.lightsaber_eleven
             else -> R.string.lightsaber_twelve
         }
-        val drawableRes = when (index) {
+        val picRes = when (index) {
+            1 -> R.drawable.pic_weapon_lightsaber_one
+            2 -> R.drawable.pic_weapon_lightsaber_two
+            3 -> R.drawable.pic_weapon_lightsaber_three
+            4 -> R.drawable.pic_weapon_lightsaber_four
+            5 -> R.drawable.pic_weapon_lightsaber_five
+            6 -> R.drawable.pic_weapon_lightsaber_six
+            7 -> R.drawable.pic_weapon_lightsaber_seven
+            8 -> R.drawable.pic_weapon_lightsaber_eight
+            9 -> R.drawable.pic_weapon_lightsaber_nine
+            10 -> R.drawable.pic_weapon_lightsaber_ten
+            11 -> R.drawable.pic_weapon_lightsaber_eleven
+            else -> R.drawable.pic_weapon_lightsaber_twelve
+        }
+        val gunRes = when (index) {
             1 -> R.drawable.gun_lightsaber_one
             2 -> R.drawable.gun_lightsaber_two
             3 -> R.drawable.gun_lightsaber_three
@@ -138,11 +161,11 @@ object WeaponRepository {
             id = "lightsaber_$index",
             nameResId = nameRes,
             type = WeaponType.LIGHTSABER,
-            showPicRes = drawableRes,
-            thumbnailRes = drawableRes,
+            showPicRes = gunRes,
+            thumbnailRes = picRes,
             magazineCapacity = 100,
             cartridgeClipCount = 1,
-            fireIntervalMs = 200L,
+            fireIntervalMs = 150L,
             shootSoundPath = "weaponsound/lightsaber/light_saber_shoot.ogg",
             reloadSoundPath = "weaponsound/lightsaber/light_saber_return.ogg"
         )
@@ -160,16 +183,23 @@ object WeaponRepository {
             else -> R.string.taser_eight
         }
         val drawableRes = when (index) {
-            1 -> R.drawable.gun_taser_one
-            2 -> R.drawable.gun_taser_two
-            3 -> R.drawable.gun_taser_three
-            4 -> R.drawable.gun_taser_four
-            5 -> R.drawable.gun_taser_five
-            6 -> R.drawable.gun_taser_six
-            7 -> R.drawable.gun_taser_seven
-            else -> R.drawable.gun_taser_eight
+            1 -> R.drawable.pic_weapon_taser_one
+            2 -> R.drawable.pic_weapon_taser_two
+            3 -> R.drawable.pic_weapon_taser_three
+            4 -> R.drawable.pic_weapon_taser_four
+            5 -> R.drawable.pic_weapon_taser_five
+            6 -> R.drawable.pic_weapon_taser_six
+            7 -> R.drawable.pic_weapon_taser_seven
+            else -> R.drawable.pic_weapon_taser_eight
         }
-        val soundPath = if (index % 2 == 1) "weaponsound/taser/taser gun1.MP3" else "weaponsound/taser/taser gun2.mp3"
+        val soundPath = "weaponsound/taser/taser gun2.mp3"
+        val (pLeft, pRight, pY) = when (index) {
+            1, 7 -> Triple(0.33f, 0.60f, 0.30f)
+            2, 6, 8 -> Triple(0.36f, 0.63f, 0.24f)
+            3, 4 -> Triple(0.47f, 0.64f, 0.22f)
+            5 -> Triple(0.47f, 0.63f, 0.20f)
+            else -> Triple(0.36f, 0.63f, 0.24f)
+        }
         Weapon(
             id = "taser_$index",
             nameResId = nameRes,
@@ -179,7 +209,9 @@ object WeaponRepository {
             magazineCapacity = 100,
             cartridgeClipCount = 1,
             fireIntervalMs = 150L,
-            shootSoundPath = soundPath
+            shootSoundPath = soundPath,
+            muzzleXPercent = (pLeft + pRight) / 2f,
+            muzzleYPercent = pY
         )
     }
 

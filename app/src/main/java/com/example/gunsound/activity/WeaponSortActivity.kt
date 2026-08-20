@@ -52,6 +52,9 @@ class WeaponSortActivity : AppCompatActivity() {
 
     private fun setupRecyclerView() {
         val weapons = WeaponRepository.getWeaponsByType(weaponType)
+        val category = WeaponRepository.categories.find { it.type == weaponType }
+        val cardBgRes = category?.cardBgDrawableRes ?: R.drawable.bg_machine_gun
+
         binding.rvWeapons.layoutManager = GridLayoutManager(this, 2)
 
         class WeaponAdapter : RecyclerView.Adapter<WeaponAdapter.ViewHolder>() {
@@ -67,9 +70,18 @@ class WeaponSortActivity : AppCompatActivity() {
 
             override fun onBindViewHolder(holder: ViewHolder, position: Int) {
                 val weapon = weapons[position]
-                holder.itemBinding.ivGun.setImageResource(weapon.showPicRes)
+                holder.itemBinding.ivGunDisplayBg.setImageResource(cardBgRes)
+                holder.itemBinding.ivGun.setImageResource(weapon.thumbnailRes)
                 holder.itemBinding.tvMachineGunName.setText(weapon.nameResId)
-                holder.itemBinding.tvBulletsNumber.text = weapon.magazineCapacity.toString()
+
+                if (weapon.isBomb || weapon.type == WeaponType.TIME_BOMB) {
+                    holder.itemBinding.ivLabelBullet.visibility = android.view.View.GONE
+                    holder.itemBinding.tvBulletsNumber.visibility = android.view.View.GONE
+                } else {
+                    holder.itemBinding.ivLabelBullet.visibility = android.view.View.VISIBLE
+                    holder.itemBinding.tvBulletsNumber.visibility = android.view.View.VISIBLE
+                    holder.itemBinding.tvBulletsNumber.text = weapon.magazineCapacity.toString()
+                }
 
                 holder.itemBinding.root.setOnClickListener {
                     SoundManager.get(this@WeaponSortActivity).playButtonClick()

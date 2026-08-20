@@ -38,5 +38,6 @@ data class WeaponCategory(
     val titleResId: Int,
     val type: WeaponType,
     val coverDrawableRes: Int,
-    val bgDrawableRes: Int
+    val bgDrawableRes: Int,
+    val cardBgDrawableRes: Int = R.drawable.bg_machine_gun
 )

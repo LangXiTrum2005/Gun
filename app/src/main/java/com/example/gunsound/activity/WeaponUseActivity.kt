@@ -38,6 +38,7 @@ class WeaponUseActivity : AppCompatActivity() {
     private var currentMode = FireMode.SINGLE
     private var isFiring = false
     private var isUnlimitedAmmo = false
+    private var isReloading = false
     private var isImmersive = false
     private val mainHandler = Handler(Looper.getMainLooper())
     private var autoFireRunnable: Runnable? = null
@@ -505,13 +506,110 @@ class WeaponUseActivity : AppCompatActivity() {
     }
 
     private fun performReload() {
+        if (isReloading || weapon.isBomb) return
+        isReloading = true
+
         soundManager.playSound(weapon.reloadSoundPath)
-        weapon.resetAmmo()
-        updateAmmoDisplay()
         binding.groupReloadBullets.visibility = View.GONE
-        weaponImageView.animate().rotation(360f).setDuration(400).withEndAction {
-            weaponImageView.rotation = 0f
-        }.start()
+
+        // Animate ammo counter pop effect on refill
+        val refillAmmoAction = {
+            weapon.resetAmmo()
+            updateAmmoDisplay()
+            ammoCounterText.animate().scaleX(1.3f).scaleY(1.3f).setDuration(120).withEndAction {
+                ammoCounterText.animate().scaleX(1.0f).scaleY(1.0f).setDuration(120).start()
+            }.start()
+        }
+
+        when (weapon.type) {
+            WeaponType.LIGHTSABER -> {
+                // Lightsaber Retract & Energy Burst Extension
+                vibrationManager.vibrateShot(50L)
+                weaponImageView.animate()
+                    .scaleY(0.15f)
+                    .alpha(0.6f)
+                    .setDuration(220)
+                    .withEndAction {
+                        refillAmmoAction()
+                        vibrationManager.vibrateShot(80L)
+                        soundManager.playSound("weaponsound/lightsaber/light_saber_shoot.ogg")
+                        weaponImageView.animate()
+                            .scaleY(1.05f)
+                            .alpha(1.0f)
+                            .setDuration(260)
+                            .withEndAction {
+                                weaponImageView.animate().scaleY(1.0f).setDuration(100).start()
+                                isReloading = false
+                            }.start()
+                    }.start()
+            }
+            WeaponType.TASER -> {
+                // Taser cartridge eject and slap in
+                vibrationManager.vibrateShot(40L)
+                weaponImageView.animate()
+                    .translationY(70f)
+                    .rotation(-8f)
+                    .setDuration(180)
+                    .withEndAction {
+                        refillAmmoAction()
+                        vibrationManager.vibrateShot(60L)
+                        weaponImageView.animate()
+                            .translationY(-20f)
+                            .rotation(3f)
+                            .setDuration(180)
+                            .withEndAction {
+                                weaponImageView.animate()
+                                    .translationY(0f)
+                                    .rotation(0f)
+                                    .setInterpolator(android.view.animation.OvershootInterpolator(1.8f))
+                                    .setDuration(150)
+                                    .withEndAction { isReloading = false }
+                                    .start()
+                            }.start()
+                    }.start()
+            }
+            else -> {
+                // Mechanical & Sci-Fi Guns: Multi-phase realistic magazine drop, slap in, and slide rack
+                // Phase 1: Magazine Drop & Weapon Tilt Down
+                vibrationManager.vibrateShot(40L)
+                weaponImageView.animate()
+                    .translationY(110f)
+                    .translationX(-25f)
+                    .rotation(-9f)
+                    .scaleX(0.94f)
+                    .scaleY(0.94f)
+                    .setInterpolator(android.view.animation.AccelerateInterpolator())
+                    .setDuration(220)
+                    .withEndAction {
+                        // Phase 2: Fresh Magazine Slam In
+                        vibrationManager.vibrateShot(70L)
+                        refillAmmoAction()
+                        weaponImageView.animate()
+                            .translationY(-40f)
+                            .translationX(10f)
+                            .rotation(4f)
+                            .scaleX(1.04f)
+                            .scaleY(1.04f)
+                            .setInterpolator(android.view.animation.DecelerateInterpolator())
+                            .setDuration(200)
+                            .withEndAction {
+                                // Phase 3: Slide Release / Cocking Recoil Snap
+                                vibrationManager.vibrateShot(50L)
+                                weaponImageView.animate()
+                                    .translationY(0f)
+                                    .translationX(0f)
+                                    .rotation(0f)
+                                    .scaleX(1.0f)
+                                    .scaleY(1.0f)
+                                    .setInterpolator(android.view.animation.OvershootInterpolator(2.2f))
+                                    .setDuration(240)
+                                    .withEndAction {
+                                        isReloading = false
+                                    }.start()
+                            }.start()
+                    }.start()
+            }
+        }
     }
 
     private fun updateAmmoDisplay() {

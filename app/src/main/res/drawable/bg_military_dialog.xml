@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="14dp" />
+            <solid android:color="#1E241C" />
+        </shape>
+    </item>
+    <item>
+        <bitmap
+            android:src="@drawable/bg_camo_card"
+            android:gravity="center" />
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="14dp" />
+            <gradient
+                android:angle="270"
+                android:startColor="#CC1E241C"
+                android:endColor="#EE1E241C"
+                android:type="linear" />
+            <stroke
+                android:width="2dp"
+                android:color="#97C95B" />
+        </shape>
+    </item>
+</layer-list>

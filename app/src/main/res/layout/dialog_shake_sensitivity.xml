@@ -6,7 +6,7 @@
     android:layout_height="match_parent">
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/background"
-        android:background="@drawable/bg_choose_dialog"
+        android:background="@drawable/bg_military_dialog"
         android:focusable="true"
         android:clickable="true"
         android:layout_width="0dp"

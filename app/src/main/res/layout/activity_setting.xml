@@ -16,6 +16,7 @@
         app:layout_constraintTop_toTopOf="parent"/>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/con_title"
+        android:background="@drawable/bg_military_title_bar"
         android:layout_width="match_parent"
         android:layout_height="56dp"
         app:layout_constraintEnd_toEndOf="parent"

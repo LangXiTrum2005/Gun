@@ -11,53 +11,53 @@ object WeaponRepository {
             titleResId = R.string.all_weapons,
             type = WeaponType.MECHANICAL_GUN,
             coverDrawableRes = R.drawable.home_machine_gun,
-            bgDrawableRes = R.drawable.secondary_page_background_machine_gun,
-            cardBgDrawableRes = R.drawable.bg_machine_gun
+            bgDrawableRes = R.drawable.bg_military_secondary,
+            cardBgDrawableRes = R.drawable.bg_military_gun_card
         ),
         WeaponCategory(
             id = "cat_lightsaber",
             titleResId = R.string.lightsaber,
             type = WeaponType.LIGHTSABER,
             coverDrawableRes = R.drawable.home_lightsaber,
-            bgDrawableRes = R.drawable.secondary_page_background_lightsaber,
-            cardBgDrawableRes = R.drawable.bg_lightsaber
+            bgDrawableRes = R.drawable.bg_military_secondary,
+            cardBgDrawableRes = R.drawable.bg_military_gun_card
         ),
         WeaponCategory(
             id = "cat_taser",
             titleResId = R.string.taser,
             type = WeaponType.TASER,
             coverDrawableRes = R.drawable.home_taser,
-            bgDrawableRes = R.drawable.secondary_page_background_taser,
-            cardBgDrawableRes = R.drawable.bg_taser
+            bgDrawableRes = R.drawable.bg_military_secondary,
+            cardBgDrawableRes = R.drawable.bg_military_gun_card
         ),
         WeaponCategory(
             id = "cat_timebomb",
             titleResId = R.string.time_bomb,
             type = WeaponType.TIME_BOMB,
             coverDrawableRes = R.drawable.home_timebomb,
-            bgDrawableRes = R.drawable.secondary_page_background_timebomb,
-            cardBgDrawableRes = R.drawable.bg_timebomb
+            bgDrawableRes = R.drawable.bg_military_secondary,
+            cardBgDrawableRes = R.drawable.bg_military_gun_card
         ),
         WeaponCategory(
             id = "cat_scifi",
             titleResId = R.string.Sci_Fi_Gun,
             type = WeaponType.SCI_FI_GUN,
             coverDrawableRes = R.drawable.home_sci_fi_gun,
-            bgDrawableRes = R.drawable.secondary_page_background_sci_fi_gun,
-            cardBgDrawableRes = R.drawable.bg_sci_fi_gun
+            bgDrawableRes = R.drawable.bg_military_secondary,
+            cardBgDrawableRes = R.drawable.bg_military_gun_card
         ),
         WeaponCategory(
             id = "cat_russian_roulette",
             titleResId = R.string.Russian_Roulette,
             type = WeaponType.RUSSIAN_ROULETTE,
             coverDrawableRes = R.drawable.home_russian_roulette,
-            bgDrawableRes = R.drawable.home_background,
-            cardBgDrawableRes = R.drawable.bg_machine_gun
+            bgDrawableRes = R.drawable.bg_military_russian_roulette,
+            cardBgDrawableRes = R.drawable.bg_military_gun_card
         )
     )
 
     val sceneBackgrounds: List<SceneBackground> = listOf(
-        SceneBackground(0, R.string.Change_Background, R.drawable.bg_thumbnail_scene_machine_gun, R.drawable.bg_scene_machine_gun),
+        SceneBackground(0, R.string.Change_Background, R.drawable.bg_thumbnail_scene_machine_gun, R.drawable.bg_military_weapon_scene),
         SceneBackground(1, R.string.Change_Background, R.drawable.bg_thumbnail_scene_light_saber, R.drawable.bg_scene_war),
         SceneBackground(2, R.string.Change_Background, R.drawable.bg_thumbnail_scene_taser, R.drawable.bg_scene_rain),
         SceneBackground(3, R.string.Change_Background, R.drawable.bg_thumbnail_scene_time_bomb, R.drawable.bg_scene_universe),
@@ -111,7 +111,8 @@ object WeaponRepository {
         Weapon("aug", R.string.weapon_name_aug, WeaponType.MECHANICAL_GUN, R.drawable.pic_weapon_show_aug, R.drawable.gun_machine_aug, 30, 2, 95L, "weaponsound/machine/gun_m4a4_shoot.MP3", muzzleXPercent = 0.5972f, muzzleYPercent = 0.1283f),
         Weapon("f2000", R.string.weapon_name_f2000, WeaponType.MECHANICAL_GUN, R.drawable.pic_weapon_show_f2000, R.drawable.gun_machine_f2000, 30, 3, 88L, "weaponsound/machine/gun_m4a4_shoot.MP3", muzzleXPercent = 0.5417f, muzzleYPercent = 0.1065f),
         Weapon("rpg7", R.string.weapon_name_rpg_7, WeaponType.MECHANICAL_GUN, R.drawable.pic_weapon_show_rpg_7, R.drawable.gun_machine_rpg_7, 1, 5, 1200L, "weaponsound/machine/rpg.MP3", muzzleXPercent = 0.5231f, muzzleYPercent = 0.0926f),
-        Weapon("flamethrower", R.string.weapon_name_m2_flamethrower, WeaponType.MECHANICAL_GUN, R.drawable.pic_weapon_show_m2_flamethrower, R.drawable.gun_machine_m2_flamethrower, 100, 1, 60L, "weaponsound/machine/fire.mp3", muzzleXPercent = 0.6065f, muzzleYPercent = 0.4465f)
+        Weapon("flamethrower", R.string.weapon_name_m2_flamethrower, WeaponType.MECHANICAL_GUN, R.drawable.pic_weapon_show_m2_flamethrower, R.drawable.gun_machine_m2_flamethrower, 100, 1, 60L, "weaponsound/machine/fire.mp3", muzzleXPercent = 0.6065f, muzzleYPercent = 0.4465f),
+        Weapon("m84", R.string.weapon_name_m84, WeaponType.MECHANICAL_GUN, R.drawable.pic_weapon_show_m84, R.drawable.gun_machine_m84, 1, 5, 1500L, "weaponsound/bomb/bomb_m84_shoot.MP3", muzzleXPercent = 0.5f, muzzleYPercent = 0.3f)
     )
 
     val lightsabers: List<Weapon> = (1..12).map { index ->

@@ -6,7 +6,7 @@
     android:layout_height="match_parent">
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/background"
-        android:background="@drawable/bg_choose_dialog"
+        android:background="@drawable/bg_military_dialog"
         android:focusable="true"
         android:clickable="true"
         android:layout_width="0dp"
@@ -34,7 +34,7 @@
         android:textColor="#ffffff"
         android:gravity="center"
         android:id="@+id/iv_title"
-        android:background="@drawable/bg_change_title"
+        android:background="@drawable/bg_military_dialog_title"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginLeft="38dp"

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@drawable/bg_splash"
+    android:background="@drawable/bg_military_splash"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <ImageView
@@ -25,13 +25,13 @@
         app:lottie_loop="true"/>
     <View
         android:id="@+id/v_bottom_line"
-        android:background="#8d909b"
+        android:background="#3F5238"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         app:layout_constraintBottom_toTopOf="@+id/con_native_ad_placement"/>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/con_native_ad_placement"
-        android:background="#252834"
+        android:background="#171E14"
         android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="0dp"

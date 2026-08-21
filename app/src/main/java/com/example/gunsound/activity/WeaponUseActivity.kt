@@ -5,16 +5,20 @@ import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.Color
 import android.graphics.PointF
 import android.graphics.PorterDuff
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Handler
 import android.os.Looper
-import android.view.animation.LinearInterpolator
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
+import android.view.animation.AccelerateInterpolator
+import android.view.animation.DecelerateInterpolator
+import android.view.animation.LinearInterpolator
+import android.view.animation.OvershootInterpolator
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
@@ -32,6 +36,7 @@ import android.net.Uri
 import com.example.gunsound.repository.WeaponRepository
 import com.example.gunsound.utils.*
 import com.example.gunsound.views.ElectricArcView
+import com.example.gunsound.views.FlashbangOverlayView
 import kotlin.random.Random
 
 class WeaponUseActivity : AppCompatActivity() {
@@ -66,6 +71,18 @@ class WeaponUseActivity : AppCompatActivity() {
     private lateinit var weaponImageView: ImageView
     private lateinit var muzzleFlashImageView: ImageView
     private lateinit var electricArcView: ElectricArcView
+    private lateinit var flashbangOverlayView: FlashbangOverlayView
+
+    // Shotgun pump-action state
+    private var shotgunNeedsPump = false
+    private var isShotgunPumping = false
+    private var shotgunTouchDownY = 0f
+
+    // M84 Flashbang state
+    private enum class GrenadeState { IDLE, PIN_PULLED, THROWN, DETONATED }
+    private var grenadeState = GrenadeState.IDLE
+    private var grenadeFuseTimer: CountDownTimer? = null
+
     private var taserJitterRunnable: Runnable? = null
     private var isBladeExtended = true
     private var lastTouchX = 0f
@@ -117,6 +134,8 @@ class WeaponUseActivity : AppCompatActivity() {
         stopAutoFire()
         stopFlamethrower()
         stopTaserShock()
+        grenadeFuseTimer?.cancel()
+        TinnitusSoundGenerator.stop()
         flashManager.turnOff()
         vibrationManager.cancel()
         soundManager.stopLoopingSound()
@@ -128,6 +147,8 @@ class WeaponUseActivity : AppCompatActivity() {
         stopTaserShock()
         stopLightsaberTouch()
         bombTimer?.cancel()
+        grenadeFuseTimer?.cancel()
+        TinnitusSoundGenerator.stop()
         flashManager.release()
         mainHandler.removeCallbacks(hideFlashRunnable)
     }
@@ -169,6 +190,14 @@ class WeaponUseActivity : AppCompatActivity() {
             visibility = View.GONE
         }
         binding.flSpine.addView(electricArcView)
+
+        flashbangOverlayView = FlashbangOverlayView(this).apply {
+            layoutParams = FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT
+            )
+        }
+        binding.clBg.addView(flashbangOverlayView)
 
         weaponImageView.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
             updateMuzzleFlashPosition()
@@ -258,8 +287,11 @@ class WeaponUseActivity : AppCompatActivity() {
             }
             WeaponType.MECHANICAL_GUN -> {
                 colorPickerBtn?.isVisible = false
-                gunEffectBtn?.isVisible = weapon.id != "flamethrower"
+                gunEffectBtn?.isVisible = weapon.id != "flamethrower" && weapon.id != "m84"
                 shakeBtn?.isVisible = true
+                if (weapon.id == "m84") {
+                    grenadeState = GrenadeState.IDLE
+                }
                 gunEffectBtn?.setOnClickListener {
                     soundManager.playButtonClick()
                     AppDialogs.showShootEffectDialog(this) {}
@@ -345,6 +377,14 @@ class WeaponUseActivity : AppCompatActivity() {
                 if (AppPreferences.get(this).isShakeSoundEnabled) {
                     triggerLightsaberSwing()
                 }
+            } else if (weapon.id == "m84") {
+                if (grenadeState == GrenadeState.IDLE) {
+                    pullGrenadePin()
+                } else if (grenadeState == GrenadeState.PIN_PULLED) {
+                    throwGrenade()
+                }
+            } else if (weapon.id == "xm1014" && shotgunNeedsPump) {
+                performShotgunPump()
             } else {
                 onWeaponTriggered(fromShake = true)
             }
@@ -353,6 +393,66 @@ class WeaponUseActivity : AppCompatActivity() {
 
     private fun handleWeaponTouch(event: MotionEvent): Boolean {
         if (weapon.isBomb) return false
+
+        // Special handling for M84 Flashbang grenade
+        if (weapon.id == "m84") {
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    lastTouchX = event.x
+                    lastTouchY = event.y
+                    if (grenadeState == GrenadeState.IDLE) {
+                        pullGrenadePin()
+                    }
+                    return true
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    if (grenadeState == GrenadeState.PIN_PULLED) {
+                        val dy = lastTouchY - event.y
+                        if (dy > 50f * resources.displayMetrics.density) {
+                            throwGrenade()
+                        }
+                    }
+                    return true
+                }
+                MotionEvent.ACTION_UP -> {
+                    if (grenadeState == GrenadeState.PIN_PULLED) {
+                        throwGrenade()
+                    }
+                    return true
+                }
+            }
+            return true
+        }
+
+        // Special handling for Pump-Action Shotgun (M1014)
+        if (weapon.id == "xm1014") {
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    shotgunTouchDownY = event.y
+                    if (shotgunNeedsPump) {
+                        soundManager.playSound("weaponsound/empty_magazine_gun.mp3")
+                        vibrationManager.vibrateShot(25L)
+                    } else {
+                        onWeaponTriggered(fromShake = false)
+                    }
+                    return true
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    if (shotgunNeedsPump && !isShotgunPumping) {
+                        val dy = event.y - shotgunTouchDownY
+                        if (dy > 45f * resources.displayMetrics.density) {
+                            performShotgunPump()
+                        }
+                    }
+                    return true
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    shotgunTouchDownY = 0f
+                    return true
+                }
+            }
+            return true
+        }
 
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
@@ -401,6 +501,29 @@ class WeaponUseActivity : AppCompatActivity() {
         if (!isUnlimitedAmmo) {
             weapon.currentAmmo--
             updateAmmoDisplay()
+        }
+
+        // Special handling for Pump-action Shotgun (M1014) firing:
+        if (weapon.id == "xm1014") {
+            soundManager.playSound(weapon.shootSoundPath)
+            flashManager.flashOnce(60L)
+            vibrationManager.vibrateShot(90L)
+
+            // Heavy shotgun recoil
+            weaponImageView.translationY = 28f
+            weaponImageView.animate().translationY(0f).setDuration(80).start()
+
+            // Buckshot muzzle flash
+            val prefs = AppPreferences.get(this)
+            val effectIndex = prefs.currentFiringEffectIndex
+            val effect = WeaponRepository.shootEffects.getOrNull(effectIndex) ?: WeaponRepository.shootEffects.first()
+            muzzleFlashImageView.setImageResource(effect.effectDrawableRes)
+            muzzleFlashImageView.visibility = View.VISIBLE
+            mainHandler.removeCallbacks(hideFlashRunnable)
+            mainHandler.postDelayed(hideFlashRunnable, 60L)
+
+            shotgunNeedsPump = true
+            return
         }
 
         // Special handling for M2 Flamethrower on tap/shake:
@@ -473,15 +596,6 @@ class WeaponUseActivity : AppCompatActivity() {
 
             // Spawn and launch rocket projectile upwards
             spawnAndLaunchRpgRocket()
-
-            // Muzzle flash & smoke at barrel top
-            val prefs = AppPreferences.get(this)
-            val effectIndex = prefs.currentFiringEffectIndex
-            val effect = WeaponRepository.shootEffects.getOrNull(effectIndex) ?: WeaponRepository.shootEffects.first()
-            muzzleFlashImageView.setImageResource(effect.effectDrawableRes)
-            muzzleFlashImageView.visibility = View.VISIBLE
-            mainHandler.removeCallbacks(hideFlashRunnable)
-            mainHandler.postDelayed(hideFlashRunnable, 140L)
             return
         }
 
@@ -495,10 +609,11 @@ class WeaponUseActivity : AppCompatActivity() {
         vibrationManager.vibrateShot(60L)
 
         // 3. Recoil Animation
-        weaponImageView.translationY = 18f
+        val recoilAmt = 18f
+        weaponImageView.translationY = recoilAmt
         weaponImageView.animate().translationY(0f).setDuration(60).start()
 
-        // 4. Single Straight Muzzle Flash Flare aligned directly with the barrel
+        // 4. Single Straight Muzzle Flash Flare
         if (weapon.type == WeaponType.MECHANICAL_GUN || weapon.type == WeaponType.SCI_FI_GUN) {
             val prefs = AppPreferences.get(this)
             val effectIndex = prefs.currentFiringEffectIndex
@@ -668,7 +783,7 @@ class WeaponUseActivity : AppCompatActivity() {
     private fun spawnBulletDrop() {
         if (!AppPreferences.get(this).isBulletDropEnabled) return
         if (weapon.isBomb || weapon.type == WeaponType.LIGHTSABER || weapon.type == WeaponType.TASER) return
-        if (weapon.id.contains("flamethrower") || weapon.id.contains("rpg") || weapon.id.contains("m84")) return
+        if (weapon.id.contains("flamethrower") || weapon.id.contains("rpg") || weapon.id.contains("m84") || weapon.id == "xm1014") return
 
         val container = binding.flSpine
         val drawable = weaponImageView.drawable ?: return
@@ -727,6 +842,212 @@ class WeaponUseActivity : AppCompatActivity() {
             })
         }
         animator.start()
+    }
+
+    private fun performShotgunPump() {
+        if (isShotgunPumping) return
+        isShotgunPumping = true
+
+        soundManager.playSound("weaponsound/machine/gun_xm1014_reload.ogg")
+        vibrationManager.vibrateShot(60L)
+
+        // Slide pump down
+        weaponImageView.animate()
+            .translationY(40f)
+            .setDuration(110L)
+            .withEndAction {
+                // Eject red shotgun shell
+                spawnShotgunShellDrop()
+
+                // Slide pump back up
+                weaponImageView.animate()
+                    .translationY(0f)
+                    .setDuration(120L)
+                    .withEndAction {
+                        shotgunNeedsPump = false
+                        isShotgunPumping = false
+                        vibrationManager.vibrateShot(40L)
+                    }
+                    .start()
+            }
+            .start()
+    }
+
+    private fun spawnShotgunShellDrop() {
+        val container = binding.flSpine
+        val drawable = weaponImageView.drawable ?: return
+        val dWidth = drawable.intrinsicWidth.toFloat()
+        val dHeight = drawable.intrinsicHeight.toFloat()
+        val vWidth = weaponImageView.width.toFloat()
+        val vHeight = weaponImageView.height.toFloat()
+        if (dWidth <= 0f || dHeight <= 0f || vWidth <= 0f || vHeight <= 0f) return
+
+        val scale = minOf(vWidth / dWidth, vHeight / dHeight)
+        val renderedWidth = dWidth * scale
+        val renderedHeight = dHeight * scale
+        val offsetX = (vWidth - renderedWidth) / 2f
+        val offsetY = (vHeight - renderedHeight) / 2f
+
+        val density = resources.displayMetrics.density
+        val startX = offsetX + renderedWidth * 0.54f
+        val startY = offsetY + renderedHeight * 0.40f
+
+        val shell = ImageView(this).apply {
+            setImageResource(R.drawable.machine_bullet)
+            setColorFilter(Color.parseColor("#E53935"), PorterDuff.Mode.SRC_ATOP) // Red shotgun shell
+            layoutParams = FrameLayout.LayoutParams(
+                (18 * density).toInt(),
+                (38 * density).toInt()
+            )
+            x = startX
+            y = startY
+            rotation = 35f
+        }
+
+        container.addView(shell)
+
+        val shootUp = (Random.nextFloat() * 85f + 75f) * density
+        val travelX = (Random.nextFloat() * 110f + 85f) * density
+        val fallDown = (Random.nextFloat() * 320f + 280f) * density
+        val totalRotation = (Random.nextFloat() * 540f + 360f)
+
+        ValueAnimator.ofFloat(0f, 1f).apply {
+            duration = 580L
+            interpolator = LinearInterpolator()
+            addUpdateListener { va ->
+                val t = va.animatedFraction
+                val curX = startX + travelX * t
+                val curY = startY - shootUp * (4f * t * (1f - t).coerceAtLeast(0f)) + fallDown * (t * t)
+                shell.x = curX
+                shell.y = curY
+                shell.rotation = 35f + t * totalRotation
+                if (t > 0.65f) {
+                    shell.alpha = ((1f - t) / 0.35f).coerceIn(0f, 1f)
+                }
+            }
+            addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    container.removeView(shell)
+                }
+            })
+            start()
+        }
+    }
+
+    private fun pullGrenadePin() {
+        if (grenadeState != GrenadeState.IDLE) return
+        grenadeState = GrenadeState.PIN_PULLED
+
+        soundManager.playSound("weaponsound/bomb/bomb_btn.ogg")
+        vibrationManager.vibrateShot(60L)
+
+        // Spawn safety ring pin flying off to the left
+        spawnGrenadePinFly()
+
+        // 2.5s Fuse countdown timer
+        grenadeFuseTimer?.cancel()
+        grenadeFuseTimer = object : CountDownTimer(2500L, 50L) {
+            override fun onTick(millisUntilFinished: Long) {
+                if (millisUntilFinished in 400L..600L) {
+                    vibrationManager.vibrateShot(20L)
+                }
+            }
+
+            override fun onFinish() {
+                detonateFlashbang()
+            }
+        }.start()
+    }
+
+    private fun spawnGrenadePinFly() {
+        val container = binding.flSpine
+        val density = resources.displayMetrics.density
+        val ring = ImageView(this).apply {
+            setImageResource(R.drawable.color_choose_thumb)
+            setColorFilter(Color.parseColor("#B0BEC5"), PorterDuff.Mode.SRC_ATOP)
+            layoutParams = FrameLayout.LayoutParams((28 * density).toInt(), (28 * density).toInt())
+            x = (weaponImageView.width * 0.44f).coerceAtLeast(60f * density)
+            y = (weaponImageView.height * 0.24f).coerceAtLeast(80f * density)
+        }
+        container.addView(ring)
+
+        val startX = ring.x
+        val startY = ring.y
+        val travelX = -(Random.nextFloat() * 120f + 90f) * density
+        val fallDown = (Random.nextFloat() * 300f + 200f) * density
+
+        ValueAnimator.ofFloat(0f, 1f).apply {
+            duration = 450L
+            addUpdateListener { va ->
+                val t = va.animatedFraction
+                ring.x = startX + travelX * t
+                ring.y = startY - (60f * density * (4f * t * (1f - t))) + fallDown * (t * t)
+                ring.rotation = -720f * t
+                if (t > 0.6f) ring.alpha = ((1f - t) / 0.4f).coerceIn(0f, 1f)
+            }
+            addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    container.removeView(ring)
+                }
+            })
+            start()
+        }
+    }
+
+    private fun throwGrenade() {
+        if (grenadeState != GrenadeState.PIN_PULLED) return
+        grenadeState = GrenadeState.THROWN
+
+        vibrationManager.vibrateShot(50L)
+
+        val flyUp = weaponImageView.height * 0.65f
+        weaponImageView.animate()
+            .translationY(-flyUp)
+            .scaleX(0.18f)
+            .scaleY(0.18f)
+            .rotation(270f)
+            .setDuration(400L)
+            .setInterpolator(AccelerateInterpolator(1.6f))
+            .withEndAction {
+                weaponImageView.visibility = View.INVISIBLE
+            }
+            .start()
+    }
+
+    private fun detonateFlashbang() {
+        if (grenadeState == GrenadeState.DETONATED) return
+        grenadeState = GrenadeState.DETONATED
+        grenadeFuseTimer?.cancel()
+        grenadeFuseTimer = null
+
+        weaponImageView.visibility = View.INVISIBLE
+
+        // 1. Flashbang blast sound
+        soundManager.playSound("weaponsound/bomb/bomb_m84_shoot.MP3")
+
+        // 2. Multi-pulse strobe camera flash
+        flashManager.flashOnce(70L)
+        mainHandler.postDelayed({ flashManager.flashOnce(60L) }, 100L)
+        mainHandler.postDelayed({ flashManager.flashOnce(60L) }, 180L)
+
+        // 3. Heavy concussion vibration
+        vibrationManager.vibrateHeavyExplosion()
+
+        // 4. Whiteout flash screen overlay (3.5s fade)
+        flashbangOverlayView.triggerFlashbang(3500L) {
+            if (!isUnlimitedAmmo) {
+                binding.groupReloadBullets.visibility = View.VISIBLE
+            }
+        }
+
+        // 5. Authentic Tinnitus Ear Ringing (3.5s sine tone)
+        TinnitusSoundGenerator.playTinnitus(3.5f, 3800.0)
+
+        // Ammo decrement
+        if (!isUnlimitedAmmo) {
+            weapon.currentAmmo = 0
+            updateAmmoDisplay()
+        }
     }
 
     private fun spawnAndLaunchRpgRocket() {
@@ -970,6 +1291,42 @@ class WeaponUseActivity : AppCompatActivity() {
                     }.start()
             }
             else -> {
+                if (weapon.id == "m84") {
+                    grenadeFuseTimer?.cancel()
+                    grenadeFuseTimer = null
+                    TinnitusSoundGenerator.stop()
+                    flashbangOverlayView.reset()
+
+                    // Fresh M84 grenade slides in from top
+                    weaponImageView.translationY = -400f
+                    weaponImageView.translationX = 0f
+                    weaponImageView.scaleX = 1f
+                    weaponImageView.scaleY = 1f
+                    weaponImageView.rotation = 0f
+                    weaponImageView.visibility = View.VISIBLE
+                    weaponImageView.setImageResource(R.drawable.gun_machine_m84)
+
+                    soundManager.playSound("weaponsound/machine/reload_bullets.mp3")
+                    vibrationManager.vibrateShot(50L)
+
+                    weaponImageView.animate()
+                        .translationY(0f)
+                        .setDuration(350L)
+                        .setInterpolator(OvershootInterpolator(1.4f))
+                        .withEndAction {
+                            grenadeState = GrenadeState.IDLE
+                            refillAmmoAction()
+                            isReloading = false
+                        }
+                        .start()
+                    return
+                }
+
+                if (weapon.id == "xm1014") {
+                    shotgunNeedsPump = false
+                    isShotgunPumping = false
+                }
+
                 if (weapon.id.contains("rpg")) {
                     // RPG-7 Rocket Reload Animation: Rocket slides from above down into the tube
                     val dWidth = 1080f

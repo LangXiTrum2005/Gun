@@ -7,7 +7,7 @@
         android:id="@+id/iv_bg"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@drawable/home_background"
+        android:src="@drawable/bg_military_main"
         android:scaleType="centerCrop"/>
     <com.example.gunsound.views.StatusBarFitView
         android:id="@+id/status_bar"
@@ -18,7 +18,7 @@
         app:layout_constraintTop_toTopOf="parent"/>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/con_title"
-        android:background="@drawable/bg_title_status"
+        android:background="@drawable/bg_military_title_bar"
         android:layout_width="match_parent"
         android:layout_height="56dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -38,7 +38,7 @@
             android:textColor="#ffffff"
             android:gravity="center"
             android:id="@+id/tv_app_name"
-            android:background="@drawable/bg_title"
+            android:background="@drawable/bg_military_title_tag"
             android:paddingLeft="35dp"
             android:paddingRight="35dp"
             android:layout_width="0dp"
@@ -66,13 +66,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/con_title"/>
     <View
-        android:background="#8d909b"
+        android:background="#3F5238"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         app:layout_constraintBottom_toTopOf="@+id/con_native_ad_placement"/>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/con_native_ad_placement"
-        android:background="#252834"
+        android:background="#171E14"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"

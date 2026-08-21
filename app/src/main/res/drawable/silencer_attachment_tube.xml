@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="36dp"
+    android:height="140dp"
+    android:viewportWidth="36"
+    android:viewportHeight="140">
+
+    <!-- =============================================================== -->
+    <!-- 1. BASE STEPPED MOUNTING ADAPTER (Khớp nối bậc gắn trực tiếp vào nòng) -->
+    <!-- =============================================================== -->
+
+    <!-- Base Outer Clamping Ring (Vòng khóa đế ôm khít đầu nòng) y: 116 to 140 -->
+    <path
+        android:pathData="M9,116 L27,116 L27,140 L9,140 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="9"
+                android:startY="128"
+                android:endX="27"
+                android:endY="128"
+                android:type="linear">
+                <item android:color="#141B1F" android:offset="0.0" />
+                <item android:color="#2C3B42" android:offset="0.25" />
+                <item android:color="#485D66" android:offset="0.45" />
+                <item android:color="#607D8B" android:offset="0.55" />
+                <item android:color="#26343A" android:offset="0.8" />
+                <item android:color="#0F1518" android:offset="1.0" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <!-- Grip Grooves on Base Ring -->
+    <path
+        android:strokeColor="#0A0E10"
+        android:strokeWidth="1.2"
+        android:pathData="M9,122 L27,122 M9,128 L27,128 M9,134 L27,134" />
+
+    <!-- Stepped Transition Collar (Cổ nối chuyển tiếp bậc 2) y: 98 to 116 -->
+    <path
+        android:pathData="M11,98 L25,98 L25,116 L11,116 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="11"
+                android:startY="107"
+                android:endX="25"
+                android:endY="107"
+                android:type="linear">
+                <item android:color="#192226" android:offset="0.0" />
+                <item android:color="#3B4D56" android:offset="0.3" />
+                <item android:color="#58717D" android:offset="0.5" />
+                <item android:color="#212C31" android:offset="0.85" />
+                <item android:color="#11171A" android:offset="1.0" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <!-- Stepped Ring Ridge -->
+    <path
+        android:strokeColor="#78909C"
+        android:strokeWidth="1.0"
+        android:pathData="M11,100 L25,100" />
+    <path
+        android:strokeColor="#0E1417"
+        android:strokeWidth="1.2"
+        android:pathData="M11,116 L25,116" />
+
+    <!-- Adapter Flange Ring (Gờ chuyển tiếp sang thân giảm thanh) y: 92 to 98 -->
+    <path
+        android:pathData="M7,92 L29,92 L29,98 L7,98 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="7"
+                android:startY="95"
+                android:endX="29"
+                android:endY="95"
+                android:type="linear">
+                <item android:color="#182125" android:offset="0.0" />
+                <item android:color="#4A5F69" android:offset="0.4" />
+                <item android:color="#78909C" android:offset="0.52" />
+                <item android:color="#151C20" android:offset="1.0" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- =============================================================== -->
+    <!-- 2. MAIN SILENCER TUBE BODY (Thân ống giảm thanh CrossFire AK-47 S) -->
+    <!-- =============================================================== -->
+
+    <!-- Main Tube 3D Gunmetal Gradient y: 8 to 92 -->
+    <path
+        android:pathData="M6,8 L30,8 L30,92 L6,92 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="6"
+                android:startY="50"
+                android:endX="30"
+                android:endY="50"
+                android:type="linear">
+                <item android:color="#161E22" android:offset="0.0" />
+                <item android:color="#2B3940" android:offset="0.18" />
+                <item android:color="#42555E" android:offset="0.38" />
+                <item android:color="#647E8A" android:offset="0.50" />
+                <item android:color="#33434B" android:offset="0.78" />
+                <item android:color="#131A1D" android:offset="1.0" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Specular Highlight Line (Dải sáng phản quang kim loại mờ) -->
+    <path
+        android:strokeColor="#78909C"
+        android:strokeWidth="1.2"
+        android:pathData="M18,12 L18,88" />
+    <path
+        android:strokeColor="#90A4AE"
+        android:strokeWidth="0.6"
+        android:pathData="M18.5,14 L18.5,86" />
+
+    <!-- Longitudinal Recessed Flutes (Rãnh tản nhiệt kim loại) -->
+    <path
+        android:strokeColor="#10171A"
+        android:strokeWidth="1.0"
+        android:pathData="M10,20 L10,80 M14,20 L14,80 M22,20 L22,80 M26,20 L26,80" />
+
+    <!-- Mid Grip Knurling Band (Vòng khía nhám giữa thân) y: 72 to 84 -->
+    <path
+        android:fillColor="#151D21"
+        android:pathData="M6,74 L30,74 L30,86 L6,86 Z" />
+    <path
+        android:strokeColor="#37474F"
+        android:strokeWidth="1.0"
+        android:pathData="M6,77 L30,77 M6,80 L30,80 M6,83 L30,83" />
+
+    <!-- =============================================================== -->
+    <!-- 3. FRONT MUZZLE CAP & EXIT HOLE (Đầu nòng thoát đạn) y: 0 to 8 -->
+    <!-- =============================================================== -->
+
+    <!-- Front Cap Bevel -->
+    <path
+        android:pathData="M7,3 L29,3 L30,8 L6,8 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="6"
+                android:startY="5.5"
+                android:endX="30"
+                android:endY="5.5"
+                android:type="linear">
+                <item android:color="#141B1F" android:offset="0.0" />
+                <item android:color="#455861" android:offset="0.45" />
+                <item android:color="#607D8B" android:offset="0.55" />
+                <item android:color="#12181B" android:offset="1.0" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Muzzle Crown Front Rim -->
+    <path
+        android:fillColor="#0D1316"
+        android:strokeColor="#546E7A"
+        android:strokeWidth="0.8"
+        android:pathData="M10,0 L26,0 L29,3 L7,3 Z" />
+
+    <!-- Recessed Bore Hole (Lỗ đạn màu đen sâu) -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M13,0 L23,0 L23,2.5 L13,2.5 Z" />
+    <path
+        android:fillColor="#263238"
+        android:pathData="M15,1 L21,1 L21,2 L15,2 Z" />
+
+</vector>

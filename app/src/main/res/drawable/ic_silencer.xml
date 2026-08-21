@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="44dp"
+    android:height="44dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Barrel / Adapter Thread -->
+    <path
+        android:fillColor="#B0BEC5"
+        android:pathData="M20,38 L28,38 L28,42 L20,42 Z" />
+    <!-- Silencer Tube Body -->
+    <path
+        android:fillColor="#ECEFF1"
+        android:pathData="M16,10 L32,10 L32,38 L16,38 Z" />
+    <!-- Tactical Ridges / Knurling Lines -->
+    <path
+        android:strokeColor="#78909C"
+        android:strokeWidth="1.5"
+        android:pathData="M16,16 L32,16 M16,22 L32,22 M16,28 L32,28 M16,34 L32,34" />
+    <!-- Front Muzzle Cap -->
+    <path
+        android:fillColor="#90A4AE"
+        android:pathData="M18,6 L30,6 L30,10 L18,10 Z" />
+    <!-- Muzzle Hole -->
+    <path
+        android:fillColor="#263238"
+        android:pathData="M21,6 L27,6 L27,8 L21,8 Z" />
+</vector>

@@ -27,7 +27,7 @@ class SettingActivity : AppCompatActivity() {
         prefs = AppPreferences.get(this)
 
         // Set background image
-        binding.ivBg.setImageResource(R.drawable.bg_setting)
+        binding.ivBg.setImageResource(R.drawable.bg_military_setting)
 
         setupSwitches()
         setupClickListeners()

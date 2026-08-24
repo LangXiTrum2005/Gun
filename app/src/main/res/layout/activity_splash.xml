@@ -14,7 +14,7 @@
         android:id="@+id/lav_loading"
         android:layout_width="wrap_content"
         android:layout_height="20dp"
-        app:layout_constraintBottom_toTopOf="@+id/con_native_ad_placement"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -23,30 +23,4 @@
         app:lottie_fileName="splash/data.json"
         app:lottie_imageAssetsFolder="splash/images"
         app:lottie_loop="true"/>
-    <View
-        android:id="@+id/v_bottom_line"
-        android:background="@color/galaxy_border"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        app:layout_constraintBottom_toTopOf="@+id/con_native_ad_placement"/>
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/con_native_ad_placement"
-        android:background="@color/galaxy_ad_surface"
-        android:visibility="gone"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintDimensionRatio="h,360:120"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-        <ImageView
-            android:id="@+id/iv_ad_placement_splash"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:src="@drawable/ad_placement_mainpage"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
-    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

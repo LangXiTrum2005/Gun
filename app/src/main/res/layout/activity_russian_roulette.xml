@@ -120,7 +120,7 @@
         android:layout_height="51dp"
         android:src="@drawable/icon_cartridge_mechanical_gun"
         android:layout_marginEnd="12dp"
-        app:layout_constraintBottom_toTopOf="@+id/con_weapon_banner"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/status_bar"
         app:layout_constraintVertical_bias="0.9434"/>
@@ -142,7 +142,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:scaleType="fitXY"
-        app:layout_constraintBottom_toTopOf="@+id/con_weapon_banner"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_percent="0.25"
         app:layout_constraintStart_toStartOf="parent"/>
@@ -175,7 +175,7 @@
         android:text="@string/Done"
         android:alpha="0"
         android:fontFamily="@font/rbi"
-        app:layout_constraintBottom_toTopOf="@+id/con_weapon_banner"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="h,280:54"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"/>
@@ -196,21 +196,8 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:alpha="0"
-        app:layout_constraintBottom_toTopOf="@+id/con_weapon_banner"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/con_weapon_banner"
-        android:background="@color/galaxy_track"
-        android:layout_width="match_parent"
-        android:layout_height="65dp"
-        app:layout_constraintBottom_toBottomOf="parent">
-        <View
-            android:id="@+id/strokeViewTop"
-            android:background="@color/galaxy_border_strong"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            app:layout_constraintTop_toTopOf="parent"/>
-    </androidx.constraintlayout.widget.ConstraintLayout>
     <include
         android:layout_width="match_parent"
         android:layout_height="match_parent"

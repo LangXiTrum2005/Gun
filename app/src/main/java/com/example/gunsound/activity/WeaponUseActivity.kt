@@ -85,6 +85,7 @@ class WeaponUseActivity : AppCompatActivity() {
     private var grenadeFuseTimer: CountDownTimer? = null
 
     private var taserJitterRunnable: Runnable? = null
+    private var energyDrainRunnable: Runnable? = null
     private var isBladeExtended = true
     private var lastTouchX = 0f
     private var lastTouchY = 0f
@@ -154,6 +155,7 @@ class WeaponUseActivity : AppCompatActivity() {
         soundManager.stopLoopingSound()
         mainHandler.removeCallbacks(hideFlashRunnable)
         mainHandler.removeCallbacks(startLightsaberHumRunnable)
+        stopEnergyDrain()
         stopLightsaberIdleEnergy()
         wasPaused = true
     }
@@ -162,6 +164,7 @@ class WeaponUseActivity : AppCompatActivity() {
         super.onDestroy()
         stopTaserShock()
         stopLightsaberTouch()
+        stopEnergyDrain()
         stopLightsaberIdleEnergy()
         bombTimer?.cancel()
         grenadeFuseTimer?.cancel()
@@ -1097,9 +1100,12 @@ class WeaponUseActivity : AppCompatActivity() {
     }
 
     private fun startTaserShock() {
+        if (!consumeEnergyOnTouchStart()) return
+
         soundManager.startLoopingSound(weapon.shootSoundPath)
         flashManager.turnOn()
         vibrationManager.vibrateContinuous(5000L)
+        startEnergyDrain()
 
         weaponImageView.post {
             val (p1, p2) = getTaserProngCoords()
@@ -1127,6 +1133,7 @@ class WeaponUseActivity : AppCompatActivity() {
     }
 
     private fun stopTaserShock() {
+        stopEnergyDrain()
         soundManager.stopLoopingSound()
         flashManager.turnOff()
         vibrationManager.cancel()
@@ -1161,6 +1168,8 @@ class WeaponUseActivity : AppCompatActivity() {
     }
 
     private fun startLightsaberTouch(event: MotionEvent) {
+        if (!consumeEnergyOnTouchStart()) return
+
         lastTouchX = event.x
         lastTouchY = event.y
 
@@ -1168,6 +1177,7 @@ class WeaponUseActivity : AppCompatActivity() {
 
         if (!isBladeExtended) {
             extendLightsaberBlade()
+            startEnergyDrain()
             return
         }
 
@@ -1186,6 +1196,7 @@ class WeaponUseActivity : AppCompatActivity() {
             }
         }
         mainHandler.post(lightsaberJitterRunnable!!)
+        startEnergyDrain()
     }
 
     private fun handleLightsaberMove(event: MotionEvent) {
@@ -1206,12 +1217,84 @@ class WeaponUseActivity : AppCompatActivity() {
     }
 
     private fun stopLightsaberTouch() {
+        stopEnergyDrain()
         lightsaberJitterRunnable?.let { mainHandler.removeCallbacks(it) }
         lightsaberJitterRunnable = null
         if (::weaponImageView.isInitialized) {
             weaponImageView.translationX = 0f
             weaponImageView.translationY = 0f
             weaponImageView.rotation = 0f
+        }
+    }
+
+    private fun isEnergyWeapon(): Boolean {
+        return weapon.type == WeaponType.LIGHTSABER || weapon.type == WeaponType.TASER
+    }
+
+    private fun consumeEnergyOnTouchStart(): Boolean {
+        if (!isEnergyWeapon() || isUnlimitedAmmo) return true
+        if (weapon.currentAmmo <= 0) {
+            handleEnergyEmpty()
+            return false
+        }
+
+        weapon.currentAmmo = (weapon.currentAmmo - 1).coerceAtLeast(0)
+        updateAmmoDisplay()
+        if (weapon.currentAmmo <= 0) {
+            handleEnergyEmpty()
+            return false
+        }
+        return true
+    }
+
+    private fun startEnergyDrain() {
+        if (!isEnergyWeapon() || isUnlimitedAmmo) return
+
+        energyDrainRunnable?.let { mainHandler.removeCallbacks(it) }
+        energyDrainRunnable = object : Runnable {
+            override fun run() {
+                if (!isEnergyWeapon() || isUnlimitedAmmo) {
+                    energyDrainRunnable = null
+                    return
+                }
+
+                if (weapon.currentAmmo <= 0) {
+                    handleEnergyEmpty()
+                    return
+                }
+
+                weapon.currentAmmo = (weapon.currentAmmo - 1).coerceAtLeast(0)
+                updateAmmoDisplay()
+                if (weapon.currentAmmo <= 0) {
+                    handleEnergyEmpty()
+                } else {
+                    mainHandler.postDelayed(this, 100L)
+                }
+            }
+        }
+        mainHandler.postDelayed(energyDrainRunnable!!, 100L)
+    }
+
+    private fun stopEnergyDrain() {
+        energyDrainRunnable?.let { mainHandler.removeCallbacks(it) }
+        energyDrainRunnable = null
+    }
+
+    private fun handleEnergyEmpty() {
+        stopEnergyDrain()
+        soundManager.playSound(weapon.emptySoundPath)
+        binding.groupReloadBullets.visibility = View.VISIBLE
+        updateAmmoDisplay()
+
+        when (weapon.type) {
+            WeaponType.TASER -> stopTaserShock()
+            WeaponType.LIGHTSABER -> {
+                stopLightsaberTouch()
+                if (isBladeExtended) {
+                    retractLightsaberBlade()
+                }
+            }
+            else -> Unit
         }
     }
 
@@ -1329,6 +1412,9 @@ class WeaponUseActivity : AppCompatActivity() {
     private fun performReload() {
         if (isReloading || weapon.isBomb) return
         isReloading = true
+        if (isEnergyWeapon()) {
+            stopEnergyDrain()
+        }
 
         soundManager.playSound(weapon.reloadSoundPath)
         binding.groupReloadBullets.visibility = View.GONE

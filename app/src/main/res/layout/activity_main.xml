@@ -61,23 +61,9 @@
         android:layout_marginLeft="13dp"
         android:layout_marginTop="8dp"
         android:layout_marginRight="13dp"
-        app:layout_constraintBottom_toTopOf="@+id/con_native_ad_placement"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/con_title"/>
-    <View
-        android:background="@color/galaxy_border"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        app:layout_constraintBottom_toTopOf="@+id/con_native_ad_placement"/>
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/con_native_ad_placement"
-        android:background="@color/galaxy_ad_surface"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintDimensionRatio="h,360:120"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -5,7 +5,7 @@
     android:layout_height="match_parent">
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/background"
-        android:background="@drawable/bg_military_dialog"
+        android:background="@drawable/bg_galaxy_dialog"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -28,7 +28,7 @@
             app:layout_constraintTop_toTopOf="parent"/>
         <TextView
             android:textSize="12sp"
-            android:textColor="#d6ffffff"
+            android:textColor="@color/galaxy_text_tertiary"
             android:gravity="center"
             android:id="@+id/tv_laser_info"
             android:layout_width="match_parent"
@@ -43,10 +43,10 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
     <TextView
         android:textSize="15sp"
-        android:textColor="#ffffff"
+        android:textColor="@color/galaxy_text_primary"
         android:gravity="center"
         android:id="@+id/iv_title"
-        android:background="@drawable/bg_military_dialog_title"
+        android:background="@drawable/bg_galaxy_dialog_title"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginLeft="38dp"

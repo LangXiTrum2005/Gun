@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="360dp"
+    android:height="220dp"
+    android:viewportWidth="600"
+    android:viewportHeight="380">
+
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M42,60 L112,18 L244,18 L278,54 L336,54 L360,40 L480,40 L528,86 L558,86 L558,306 L520,306 L492,340 L324,340 L288,362 L116,362 L78,338 L42,338 Z"
+        android:strokeColor="@color/galaxy_tech_glow"
+        android:strokeLineJoin="miter"
+        android:strokeWidth="9" />
+
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M42,60 L112,18 L244,18 L278,54 L336,54 L360,40 L480,40 L528,86 L558,86 L558,306 L520,306 L492,340 L324,340 L288,362 L116,362 L78,338 L42,338 Z"
+        android:strokeColor="@color/galaxy_accent"
+        android:strokeLineJoin="miter"
+        android:strokeWidth="3" />
+
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M274,66 L346,66 L368,52 L488,52 L536,98 L568,130"
+        android:strokeColor="@color/galaxy_tech_node"
+        android:strokeLineCap="square"
+        android:strokeLineJoin="miter"
+        android:strokeWidth="4" />
+
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M294,74 L416,74"
+        android:strokeColor="@color/galaxy_accent"
+        android:strokeLineCap="square"
+        android:strokeWidth="3" />
+
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M424,74 L438,74 M448,74 L462,74 M472,74 L486,74"
+        android:strokeColor="@color/galaxy_tech_node"
+        android:strokeLineCap="square"
+        android:strokeWidth="4" />
+
+    <path
+        android:fillColor="@color/galaxy_tech_node"
+        android:pathData="M78,30 L88,30 L88,48 L78,48 Z M112,30 L122,30 L122,48 L112,48 Z M146,30 L156,30 L156,48 L146,48 Z M180,30 L190,30 L190,48 L180,48 Z M214,30 L224,30 L224,48 L214,48 Z" />
+
+    <path
+        android:fillColor="@color/galaxy_accent"
+        android:pathData="M82,30 L90,30 L90,48 L82,48 Z M116,30 L124,30 L124,48 L116,48 Z M150,30 L158,30 L158,48 L150,48 Z M184,30 L192,30 L192,48 L184,48 Z M218,30 L226,30 L226,48 L218,48 Z" />
+
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M58,76 L58,188 M58,76 L72,88 M58,188 L72,174"
+        android:strokeColor="@color/galaxy_accent"
+        android:strokeLineCap="square"
+        android:strokeLineJoin="miter"
+        android:strokeWidth="7" />
+
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M68,100 L68,174"
+        android:strokeColor="@color/galaxy_tech_node"
+        android:strokeLineCap="square"
+        android:strokeWidth="8" />
+
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M80,218 L108,190 M80,238 L112,206 M80,258 L112,226 M80,278 L108,250 M80,298 L112,266"
+        android:strokeColor="@color/galaxy_tech_node"
+        android:strokeLineCap="square"
+        android:strokeWidth="3" />
+
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M108,190 L128,190 M112,206 L132,206 M112,226 L132,226 M108,250 L128,250 M112,266 L132,266"
+        android:strokeColor="@color/galaxy_accent"
+        android:strokeLineCap="square"
+        android:strokeWidth="3" />
+
+    <path
+        android:fillColor="@color/galaxy_tech_node"
+        android:pathData="M130,190 m -5,0 a5,5 0,1 0 10,0 a5,5 0,1 0 -10,0 M134,206 m -5,0 a5,5 0,1 0 10,0 a5,5 0,1 0 -10,0 M134,226 m -5,0 a5,5 0,1 0 10,0 a5,5 0,1 0 -10,0 M130,250 m -5,0 a5,5 0,1 0 10,0 a5,5 0,1 0 -10,0 M134,266 m -5,0 a5,5 0,1 0 10,0 a5,5 0,1 0 -10,0" />
+
+    <path
+        android:fillColor="@color/galaxy_accent"
+        android:pathData="M70,300 m -6,0 a6,6 0,1 0 12,0 a6,6 0,1 0 -12,0 M544,204 m -7,0 a7,7 0,1 0 14,0 a7,7 0,1 0 -14,0 M300,354 m -7,0 a7,7 0,1 0 14,0 a7,7 0,1 0 -14,0" />
+
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M544,132 L544,252 M574,268 L574,338 L304,338"
+        android:strokeColor="@color/galaxy_tech_node"
+        android:strokeLineCap="square"
+        android:strokeWidth="4" />
+
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M350,298 L362,310 L350,322 M366,298 L378,310 L366,322 M382,298 L394,310 L382,322 M398,298 L410,310 L398,322 M414,298 L426,310 L414,322 M430,298 L442,310 L430,322 M446,298 L458,310 L446,322 M462,298 L474,310 L462,322"
+        android:strokeColor="@color/galaxy_tech_node"
+        android:strokeLineCap="square"
+        android:strokeLineJoin="miter"
+        android:strokeWidth="4" />
+
+    <path
+        android:fillColor="@color/galaxy_tech_node"
+        android:pathData="M528,314 L558,314 L558,284 Z" />
+
+    <path
+        android:fillColor="@color/galaxy_accent"
+        android:pathData="M526,320 L564,320 L564,282 L556,292 L556,312 L536,312 Z" />
+</vector>

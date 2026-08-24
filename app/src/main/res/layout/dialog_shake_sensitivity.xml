@@ -6,7 +6,7 @@
     android:layout_height="match_parent">
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/background"
-        android:background="@drawable/bg_military_dialog"
+        android:background="@drawable/bg_galaxy_dialog"
         android:focusable="true"
         android:clickable="true"
         android:layout_width="0dp"
@@ -30,7 +30,7 @@
             app:layout_constraintWidth_percent="0.4375"/>
         <TextView
             android:textSize="15sp"
-            android:textColor="#ffffff"
+            android:textColor="@color/galaxy_text_primary"
             android:gravity="center"
             android:id="@+id/tv_app_name"
             android:layout_width="0dp"
@@ -82,7 +82,7 @@
                 app:thumbDrawable="@drawable/thumb_sensitivity_seekbar"/>
             <TextView
                 android:textSize="15sp"
-                android:textColor="#ffffff"
+                android:textColor="@color/galaxy_text_primary"
                 android:gravity="center"
                 android:id="@+id/tv_max_sensitivity"
                 android:layout_width="wrap_content"

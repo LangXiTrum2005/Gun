@@ -2,15 +2,15 @@
 <resources>
     <!-- Base application theme -->
     <style name="Theme.NewGunPrank" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="colorPrimary">#2F6A45</item>
-        <item name="colorPrimaryVariant">#1E241C</item>
+        <item name="colorPrimary">@color/galaxy_surface_high</item>
+        <item name="colorPrimaryVariant">@color/galaxy_bg_deep</item>
         <item name="colorOnPrimary">@color/white</item>
-        <item name="colorSecondary">#97C95B</item>
-        <item name="colorSecondaryVariant">#32412A</item>
+        <item name="colorSecondary">@color/galaxy_accent</item>
+        <item name="colorSecondaryVariant">@color/galaxy_border</item>
         <item name="colorOnSecondary">@color/white</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:navigationBarColor">#1E241C</item>
-        <item name="android:windowBackground">@drawable/bg_military_main</item>
+        <item name="android:navigationBarColor">@color/galaxy_ad_surface</item>
+        <item name="android:windowBackground">@drawable/bg_galaxy_main</item>
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowNoTitle">true</item>
     </style>
@@ -19,7 +19,7 @@
 
     <!-- Fullscreen style for SplashActivity -->
     <style name="full_screen_style" parent="Theme.NewGunPrank">
-        <item name="android:windowBackground">@drawable/bg_military_splash</item>
+        <item name="android:windowBackground">@drawable/bg_galaxy_splash</item>
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowNoTitle">true</item>
     </style>
@@ -62,49 +62,49 @@
 
     <!-- Category Themes -->
     <style name="MechanicalGunTheme" parent="Theme.NewGunPrank">
-        <item name="android:windowBackground">@drawable/bg_military_weapon_scene</item>
+        <item name="android:windowBackground">@drawable/bg_galaxy_weapon_scene</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowFullscreen">true</item>
     </style>
 
     <style name="LightSaberTheme" parent="Theme.NewGunPrank">
-        <item name="android:windowBackground">@drawable/bg_military_secondary</item>
+        <item name="android:windowBackground">@drawable/bg_galaxy_secondary</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowFullscreen">true</item>
     </style>
 
     <style name="TaserTheme" parent="Theme.NewGunPrank">
-        <item name="android:windowBackground">@drawable/bg_military_secondary</item>
+        <item name="android:windowBackground">@drawable/bg_galaxy_secondary</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowFullscreen">true</item>
     </style>
 
     <style name="TaserSortsTheme" parent="Theme.NewGunPrank">
-        <item name="android:windowBackground">@drawable/bg_military_secondary</item>
+        <item name="android:windowBackground">@drawable/bg_galaxy_secondary</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowFullscreen">true</item>
     </style>
 
     <style name="TechnologyGunTheme" parent="Theme.NewGunPrank">
-        <item name="android:windowBackground">@drawable/bg_military_secondary</item>
+        <item name="android:windowBackground">@drawable/bg_galaxy_secondary</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowFullscreen">true</item>
     </style>
 
     <style name="TechnologyGunSortsTheme" parent="Theme.NewGunPrank">
-        <item name="android:windowBackground">@drawable/bg_military_secondary</item>
+        <item name="android:windowBackground">@drawable/bg_galaxy_secondary</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowFullscreen">true</item>
     </style>
 
     <style name="TimeBombTheme" parent="Theme.NewGunPrank">
-        <item name="android:windowBackground">@drawable/bg_military_secondary</item>
+        <item name="android:windowBackground">@drawable/bg_galaxy_secondary</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowFullscreen">true</item>
     </style>
 
     <style name="TimeBombSortsTheme" parent="Theme.NewGunPrank">
-        <item name="android:windowBackground">@drawable/bg_military_secondary</item>
+        <item name="android:windowBackground">@drawable/bg_galaxy_secondary</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowFullscreen">true</item>
     </style>

@@ -3,7 +3,7 @@
     <!-- 1. Real Camo Background -->
     <item>
         <bitmap
-            android:src="@drawable/bg_camo_military"
+            android:src="@drawable/bg_camo_military_dark"
             android:gravity="center" />
     </item>
     <!-- 2. Subtle Dark Tactical Vignette for Contrast & Readability -->
@@ -11,9 +11,9 @@
         <shape android:shape="rectangle">
             <gradient
                 android:angle="270"
-                android:startColor="#660D120B"
-                android:centerColor="#33000000"
-                android:endColor="#880A0E08"
+                android:startColor="#99070A06"
+                android:centerColor="#660B0F09"
+                android:endColor="#D9070A06"
                 android:type="linear" />
         </shape>
     </item>

@@ -15,7 +15,7 @@
         android:id="@+id/iv_gun_display_bg"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:src="@drawable/bg_military_gun_card"
+        android:src="@drawable/bg_galaxy_gun_card"
         android:scaleType="fitXY"
         app:layout_constraintBottom_toTopOf="@+id/space_bottom"
         app:layout_constraintDimensionRatio="h,492:330"
@@ -43,7 +43,7 @@
             android:id="@+id/bg_text_machine_gun"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:src="@drawable/bg_military_gun_label"
+            android:src="@drawable/bg_galaxy_gun_label"
             android:scaleType="fitXY"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintDimensionRatio="h,164:26"
@@ -51,7 +51,7 @@
             app:layout_constraintStart_toStartOf="parent"/>
         <TextView
             android:textSize="13sp"
-            android:textColor="#fff"
+            android:textColor="@color/galaxy_text_primary"
             android:gravity="end"
             android:id="@+id/tv_machine_gun_name"
             android:layout_width="0dp"
@@ -78,7 +78,7 @@
             app:layout_constraintTop_toTopOf="@+id/bg_text_machine_gun"/>
         <TextView
             android:textSize="12sp"
-            android:textColor="#e6ffffff"
+            android:textColor="@color/galaxy_text_secondary"
             android:id="@+id/tv_bullets_number"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

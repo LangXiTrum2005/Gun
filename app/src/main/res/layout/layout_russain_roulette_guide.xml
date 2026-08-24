@@ -125,7 +125,7 @@
         android:fontFamily="@font/gb"
         android:gravity="center"
         android:text="@string/OK_got_it"
-        android:textColor="#fff"
+        android:textColor="@color/galaxy_text_primary"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="h,280:54"

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <bitmap
+            android:src="@drawable/bg_galaxy_2026"
+            android:gravity="fill" />
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="270"
+                android:startColor="#6603040D"
+                android:centerColor="#33060817"
+                android:endColor="#CC03040D"
+                android:type="linear" />
+        </shape>
+    </item>
+</layer-list>

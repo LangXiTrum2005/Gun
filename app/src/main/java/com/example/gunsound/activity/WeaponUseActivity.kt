@@ -53,6 +53,7 @@ class WeaponUseActivity : AppCompatActivity() {
     private var isUnlimitedAmmo = false
     private var isReloading = false
     private var isImmersive = false
+    private var wasPaused = false
     private val mainHandler = Handler(Looper.getMainLooper())
     private var autoFireRunnable: Runnable? = null
     private var flameRunnable: Runnable? = null
@@ -88,6 +89,11 @@ class WeaponUseActivity : AppCompatActivity() {
     private var lastTouchX = 0f
     private var lastTouchY = 0f
     private var lightsaberJitterRunnable: Runnable? = null
+    private val startLightsaberHumRunnable = Runnable {
+        if (weapon.type == WeaponType.LIGHTSABER && isBladeExtended) {
+            soundManager.startLoopingSound("weaponsound/lightsaber/light_saber_circle_default.ogg")
+        }
+    }
     private val hideFlashRunnable = Runnable {
         if (::muzzleFlashImageView.isInitialized) {
             muzzleFlashImageView.visibility = View.GONE
@@ -126,6 +132,10 @@ class WeaponUseActivity : AppCompatActivity() {
         super.onResume()
         shakeDetector?.start()
         updateMuzzleFlashPosition()
+        if (wasPaused && weapon.type == WeaponType.LIGHTSABER && isBladeExtended) {
+            mainHandler.postDelayed(startLightsaberHumRunnable, 120L)
+        }
+        wasPaused = false
     }
 
     override fun onPause() {
@@ -140,6 +150,8 @@ class WeaponUseActivity : AppCompatActivity() {
         vibrationManager.cancel()
         soundManager.stopLoopingSound()
         mainHandler.removeCallbacks(hideFlashRunnable)
+        mainHandler.removeCallbacks(startLightsaberHumRunnable)
+        wasPaused = true
     }
 
     override fun onDestroy() {
@@ -151,6 +163,7 @@ class WeaponUseActivity : AppCompatActivity() {
         TinnitusSoundGenerator.stop()
         flashManager.release()
         mainHandler.removeCallbacks(hideFlashRunnable)
+        mainHandler.removeCallbacks(startLightsaberHumRunnable)
     }
 
     private fun setupViews() {
@@ -201,6 +214,9 @@ class WeaponUseActivity : AppCompatActivity() {
 
         weaponImageView.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
             updateMuzzleFlashPosition()
+            if (weapon.type == WeaponType.LIGHTSABER) {
+                prepareLightsaberPivot()
+            }
         }
 
         ammoCounterText = findViewById(R.id.tv_bullets_number_in_cartridge_clip)
@@ -430,8 +446,15 @@ class WeaponUseActivity : AppCompatActivity() {
                 MotionEvent.ACTION_DOWN -> {
                     shotgunTouchDownY = event.y
                     if (shotgunNeedsPump) {
-                        soundManager.playSound("weaponsound/empty_magazine_gun.mp3")
-                        vibrationManager.vibrateShot(25L)
+                        performShotgunPump {
+                            if (weapon.currentAmmo > 0 || isUnlimitedAmmo) {
+                                onWeaponTriggered(fromShake = false)
+                            } else {
+                                soundManager.playSound(weapon.emptySoundPath)
+                                binding.groupReloadBullets.visibility = View.VISIBLE
+                                updateAmmoDisplay()
+                            }
+                        }
                     } else {
                         onWeaponTriggered(fromShake = false)
                     }
@@ -844,7 +867,7 @@ class WeaponUseActivity : AppCompatActivity() {
         animator.start()
     }
 
-    private fun performShotgunPump() {
+    private fun performShotgunPump(afterPump: (() -> Unit)? = null) {
         if (isShotgunPumping) return
         isShotgunPumping = true
 
@@ -867,6 +890,7 @@ class WeaponUseActivity : AppCompatActivity() {
                         shotgunNeedsPump = false
                         isShotgunPumping = false
                         vibrationManager.vibrateShot(40L)
+                        afterPump?.invoke()
                     }
                     .start()
             }
@@ -1205,36 +1229,74 @@ class WeaponUseActivity : AppCompatActivity() {
         }
     }
 
+    private fun prepareLightsaberPivot() {
+        if (!::weaponImageView.isInitialized) return
+        val width = weaponImageView.width.toFloat()
+        val height = weaponImageView.height.toFloat()
+        if (width <= 0f || height <= 0f) return
+
+        weaponImageView.pivotX = width * 0.5f
+        weaponImageView.pivotY = height * 0.82f
+    }
+
+    private fun resetLightsaberVisualState() {
+        if (!::weaponImageView.isInitialized) return
+        mainHandler.removeCallbacks(startLightsaberHumRunnable)
+        weaponImageView.animate().cancel()
+        weaponImageView.rotation = 0f
+        weaponImageView.translationX = 0f
+        weaponImageView.translationY = 0f
+        prepareLightsaberPivot()
+    }
+
+    private fun pulseLightsaberIgnitionFlash() {
+        flashManager.flashOnce(45L)
+        mainHandler.postDelayed({ flashManager.flashOnce(35L) }, 150L)
+        mainHandler.postDelayed({ vibrationManager.vibrateShot(35L) }, 170L)
+    }
+
     private fun retractLightsaberBlade() {
+        stopLightsaberTouch()
+        resetLightsaberVisualState()
         isBladeExtended = false
         soundManager.playSound("weaponsound/lightsaber/light_saber_return.ogg")
         soundManager.stopLoopingSound()
         vibrationManager.vibrateShot(50L)
         weaponImageView.animate()
-            .scaleX(0.08f)
-            .scaleY(0.08f)
-            .alpha(0.35f)
-            .setDuration(220)
+            .scaleX(0.42f)
+            .scaleY(0.04f)
+            .alpha(0.22f)
+            .setDuration(260)
             .setInterpolator(android.view.animation.AccelerateInterpolator())
             .withEndAction {
+                weaponImageView.scaleX = 0.42f
+                weaponImageView.scaleY = 0.04f
+                weaponImageView.alpha = 0.22f
                 isReloading = false
             }
             .start()
     }
 
     private fun extendLightsaberBlade() {
+        resetLightsaberVisualState()
         isBladeExtended = true
         soundManager.playSound("weaponsound/lightsaber/light_saber_shoot.ogg")
-        soundManager.startLoopingSound("weaponsound/lightsaber/light_saber_circle_default.ogg")
-        flashManager.flashOnce(60L)
+        mainHandler.postDelayed(startLightsaberHumRunnable, 180L)
+        pulseLightsaberIgnitionFlash()
         vibrationManager.vibrateShot(80L)
+        weaponImageView.scaleX = 0.48f
+        weaponImageView.scaleY = 0.05f
+        weaponImageView.alpha = 0.28f
         weaponImageView.animate()
             .scaleX(1.0f)
             .scaleY(1.0f)
             .alpha(1.0f)
-            .setDuration(280)
-            .setInterpolator(android.view.animation.OvershootInterpolator(1.8f))
+            .setDuration(340)
+            .setInterpolator(android.view.animation.OvershootInterpolator(1.18f))
             .withEndAction {
+                weaponImageView.scaleX = 1.0f
+                weaponImageView.scaleY = 1.0f
+                weaponImageView.alpha = 1.0f
                 isReloading = false
             }
             .start()

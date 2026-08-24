@@ -3,7 +3,7 @@
     <item>
         <shape android:shape="rectangle">
             <corners android:radius="10dp" />
-            <solid android:color="#1E241C" />
+            <solid android:color="@color/military_surface" />
         </shape>
     </item>
     <item>
@@ -16,12 +16,12 @@
             <corners android:radius="10dp" />
             <gradient
                 android:angle="270"
-                android:startColor="#44000000"
-                android:endColor="#88000000"
+                android:startColor="@color/military_scrim_soft"
+                android:endColor="@color/military_scrim"
                 android:type="linear" />
             <stroke
                 android:width="1.5dp"
-                android:color="#97C95B" />
+                android:color="@color/military_border_strong" />
         </shape>
     </item>
 </layer-list>

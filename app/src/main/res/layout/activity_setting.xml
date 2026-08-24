@@ -16,7 +16,7 @@
         app:layout_constraintTop_toTopOf="parent"/>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/con_title"
-        android:background="@drawable/bg_military_title_bar"
+        android:background="@drawable/bg_galaxy_title_bar"
         android:layout_width="match_parent"
         android:layout_height="56dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -33,7 +33,7 @@
             app:layout_constraintTop_toTopOf="parent"/>
         <TextView
             android:textSize="18sp"
-            android:textColor="#ffffff"
+            android:textColor="@color/galaxy_text_primary"
             android:gravity="center"
             android:id="@+id/tv_weapon_sort"
             android:layout_width="wrap_content"
@@ -60,14 +60,14 @@
             android:layout_height="wrap_content">
             <View
                 android:id="@+id/layout_all_weapons"
-                android:background="@drawable/bg_settings_part"
+                android:background="@drawable/bg_galaxy_settings_part"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 app:layout_constraintBottom_toBottomOf="@+id/switch_firing_sound"
                 app:layout_constraintTop_toTopOf="parent"/>
             <TextView
                 android:textSize="18sp"
-                android:textColor="#ffffff"
+                android:textColor="@color/galaxy_text_primary"
                 android:id="@+id/tv_all_weapons"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -87,7 +87,7 @@
                 app:layout_constraintTop_toTopOf="@+id/switch_flash"/>
             <TextView
                 android:textSize="14sp"
-                android:textColor="#e6ffffff"
+                android:textColor="@color/galaxy_text_secondary"
                 android:id="@+id/tv_flash"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -120,7 +120,7 @@
                 app:layout_constraintTop_toTopOf="@+id/switch_screen_flash"/>
             <TextView
                 android:textSize="14sp"
-                android:textColor="#e6ffffff"
+                android:textColor="@color/galaxy_text_secondary"
                 android:id="@+id/tv_screen_flash"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -152,7 +152,7 @@
                 app:layout_constraintTop_toTopOf="@+id/switch_haptic"/>
             <TextView
                 android:textSize="14sp"
-                android:textColor="#e6ffffff"
+                android:textColor="@color/galaxy_text_secondary"
                 android:id="@+id/tv_haptic"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -184,7 +184,7 @@
                 app:layout_constraintTop_toTopOf="@+id/switch_firing_sound"/>
             <TextView
                 android:textSize="14sp"
-                android:textColor="#e6ffffff"
+                android:textColor="@color/galaxy_text_secondary"
                 android:id="@+id/tv_sound"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -207,7 +207,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/switch_haptic"/>
             <View
                 android:id="@+id/layout_machine_gun"
-                android:background="@drawable/bg_settings_part"
+                android:background="@drawable/bg_galaxy_settings_part"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_marginTop="10dp"
@@ -215,7 +215,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/layout_all_weapons"/>
             <TextView
                 android:textSize="18sp"
-                android:textColor="#ffffff"
+                android:textColor="@color/galaxy_text_primary"
                 android:id="@+id/tv_machine_gun"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -235,7 +235,7 @@
                 app:layout_constraintTop_toTopOf="@+id/switch_bullet"/>
             <TextView
                 android:textSize="14sp"
-                android:textColor="#e6ffffff"
+                android:textColor="@color/galaxy_text_secondary"
                 android:id="@+id/tv_bullet"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -259,7 +259,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/tv_machine_gun"/>
             <View
                 android:id="@+id/layout_light_saber"
-                android:background="@drawable/bg_settings_part"
+                android:background="@drawable/bg_galaxy_settings_part"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_marginTop="10dp"
@@ -267,7 +267,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/layout_machine_gun"/>
             <TextView
                 android:textSize="18sp"
-                android:textColor="#ffffff"
+                android:textColor="@color/galaxy_text_primary"
                 android:id="@+id/tv_light_saber"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -287,7 +287,7 @@
                 app:layout_constraintTop_toTopOf="@+id/switch_shake_sound"/>
             <TextView
                 android:textSize="14sp"
-                android:textColor="#e6ffffff"
+                android:textColor="@color/galaxy_text_secondary"
                 android:id="@+id/tv_shake_sound"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -311,7 +311,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/tv_light_saber"/>
             <View
                 android:id="@+id/layout_time_bomb"
-                android:background="@drawable/bg_settings_part"
+                android:background="@drawable/bg_galaxy_settings_part"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_marginTop="10dp"
@@ -319,7 +319,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/layout_light_saber"/>
             <TextView
                 android:textSize="18sp"
-                android:textColor="#ffffff"
+                android:textColor="@color/galaxy_text_primary"
                 android:id="@+id/tv_time_bomb"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -339,7 +339,7 @@
                 app:layout_constraintTop_toTopOf="@+id/switch_explosion"/>
             <TextView
                 android:textSize="14sp"
-                android:textColor="#e6ffffff"
+                android:textColor="@color/galaxy_text_secondary"
                 android:id="@+id/tv_explosion"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -363,7 +363,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/tv_time_bomb"/>
             <View
                 android:id="@+id/layout_app"
-                android:background="@drawable/bg_settings_part"
+                android:background="@drawable/bg_galaxy_settings_part"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_marginTop="10dp"
@@ -371,7 +371,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/layout_time_bomb"/>
             <TextView
                 android:textSize="18sp"
-                android:textColor="#ffffff"
+                android:textColor="@color/galaxy_text_primary"
                 android:id="@+id/tv_app"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -391,7 +391,7 @@
                 app:layout_constraintTop_toTopOf="@+id/switch_click_sound"/>
             <TextView
                 android:textSize="14sp"
-                android:textColor="#e6ffffff"
+                android:textColor="@color/galaxy_text_secondary"
                 android:id="@+id/tv_click_sound"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -424,7 +424,7 @@
                 app:layout_constraintTop_toTopOf="@+id/switch_bgm"/>
             <TextView
                 android:textSize="14sp"
-                android:textColor="#e6ffffff"
+                android:textColor="@color/galaxy_text_secondary"
                 android:id="@+id/tv_bgm"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -447,7 +447,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/switch_click_sound"/>
             <View
                 android:id="@+id/layout_about_us"
-                android:background="@drawable/bg_settings_part"
+                android:background="@drawable/bg_galaxy_settings_part"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_marginTop="10dp"
@@ -455,7 +455,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/layout_app"/>
             <TextView
                 android:textSize="18sp"
-                android:textColor="#ffffff"
+                android:textColor="@color/galaxy_text_primary"
                 android:id="@+id/tv_about_us"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -475,7 +475,7 @@
                 app:layout_constraintTop_toTopOf="@+id/switch_rate"/>
             <TextView
                 android:textSize="14sp"
-                android:textColor="#e6ffffff"
+                android:textColor="@color/galaxy_text_secondary"
                 android:id="@+id/tv_rate"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -520,7 +520,7 @@
                 app:layout_constraintTop_toTopOf="@+id/switch_more_apps"/>
             <TextView
                 android:textSize="14sp"
-                android:textColor="#e6ffffff"
+                android:textColor="@color/galaxy_text_secondary"
                 android:id="@+id/tv_more_apps"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -560,7 +560,7 @@
                 app:layout_constraintTop_toTopOf="@+id/switch_share"/>
             <TextView
                 android:textSize="14sp"
-                android:textColor="#e6ffffff"
+                android:textColor="@color/galaxy_text_secondary"
                 android:id="@+id/tv_share"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -600,7 +600,7 @@
                 app:layout_constraintTop_toTopOf="@+id/switch_feedback"/>
             <TextView
                 android:textSize="14sp"
-                android:textColor="#e6ffffff"
+                android:textColor="@color/galaxy_text_secondary"
                 android:id="@+id/tv_feedback"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -640,7 +640,7 @@
                 app:layout_constraintTop_toTopOf="@+id/switch_privacy_policy"/>
             <TextView
                 android:textSize="14sp"
-                android:textColor="#e6ffffff"
+                android:textColor="@color/galaxy_text_secondary"
                 android:id="@+id/tv_privacy_policy"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

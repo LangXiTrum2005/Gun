@@ -11,53 +11,53 @@ object WeaponRepository {
             titleResId = R.string.all_weapons,
             type = WeaponType.MECHANICAL_GUN,
             coverDrawableRes = R.drawable.home_machine_gun,
-            bgDrawableRes = R.drawable.bg_military_secondary,
-            cardBgDrawableRes = R.drawable.bg_military_gun_card
+            bgDrawableRes = R.drawable.bg_galaxy_secondary,
+            cardBgDrawableRes = R.drawable.bg_galaxy_gun_card
         ),
         WeaponCategory(
             id = "cat_lightsaber",
             titleResId = R.string.lightsaber,
             type = WeaponType.LIGHTSABER,
             coverDrawableRes = R.drawable.home_lightsaber,
-            bgDrawableRes = R.drawable.bg_military_secondary,
-            cardBgDrawableRes = R.drawable.bg_military_gun_card
+            bgDrawableRes = R.drawable.bg_galaxy_secondary,
+            cardBgDrawableRes = R.drawable.bg_galaxy_gun_card
         ),
         WeaponCategory(
             id = "cat_taser",
             titleResId = R.string.taser,
             type = WeaponType.TASER,
             coverDrawableRes = R.drawable.home_taser,
-            bgDrawableRes = R.drawable.bg_military_secondary,
-            cardBgDrawableRes = R.drawable.bg_military_gun_card
+            bgDrawableRes = R.drawable.bg_galaxy_secondary,
+            cardBgDrawableRes = R.drawable.bg_galaxy_gun_card
         ),
         WeaponCategory(
             id = "cat_timebomb",
             titleResId = R.string.time_bomb,
             type = WeaponType.TIME_BOMB,
             coverDrawableRes = R.drawable.home_timebomb,
-            bgDrawableRes = R.drawable.bg_military_secondary,
-            cardBgDrawableRes = R.drawable.bg_military_gun_card
+            bgDrawableRes = R.drawable.bg_galaxy_secondary,
+            cardBgDrawableRes = R.drawable.bg_galaxy_gun_card
         ),
         WeaponCategory(
             id = "cat_scifi",
             titleResId = R.string.Sci_Fi_Gun,
             type = WeaponType.SCI_FI_GUN,
             coverDrawableRes = R.drawable.home_sci_fi_gun,
-            bgDrawableRes = R.drawable.bg_military_secondary,
-            cardBgDrawableRes = R.drawable.bg_military_gun_card
+            bgDrawableRes = R.drawable.bg_galaxy_secondary,
+            cardBgDrawableRes = R.drawable.bg_galaxy_gun_card
         ),
         WeaponCategory(
             id = "cat_russian_roulette",
             titleResId = R.string.Russian_Roulette,
             type = WeaponType.RUSSIAN_ROULETTE,
             coverDrawableRes = R.drawable.home_russian_roulette,
-            bgDrawableRes = R.drawable.bg_military_russian_roulette,
-            cardBgDrawableRes = R.drawable.bg_military_gun_card
+            bgDrawableRes = R.drawable.bg_galaxy_russian_roulette,
+            cardBgDrawableRes = R.drawable.bg_galaxy_gun_card
         )
     )
 
     val sceneBackgrounds: List<SceneBackground> = listOf(
-        SceneBackground(0, R.string.Change_Background, R.drawable.bg_thumbnail_scene_machine_gun, R.drawable.bg_military_weapon_scene),
+        SceneBackground(0, R.string.Change_Background, R.drawable.bg_thumbnail_scene_machine_gun, R.drawable.bg_galaxy_weapon_scene),
         SceneBackground(1, R.string.Change_Background, R.drawable.bg_thumbnail_scene_light_saber, R.drawable.bg_scene_war),
         SceneBackground(2, R.string.Change_Background, R.drawable.bg_thumbnail_scene_taser, R.drawable.bg_scene_rain),
         SceneBackground(3, R.string.Change_Background, R.drawable.bg_thumbnail_scene_time_bomb, R.drawable.bg_scene_universe),

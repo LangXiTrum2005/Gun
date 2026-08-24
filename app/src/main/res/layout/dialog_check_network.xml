@@ -24,7 +24,7 @@
             app:layout_constraintTop_toTopOf="parent"/>
         <TextView
             android:textSize="15sp"
-            android:textColor="#fff"
+            android:textColor="@color/galaxy_text_primary"
             android:gravity="center"
             android:id="@+id/tv_not_internet"
             android:layout_width="0dp"
@@ -53,7 +53,7 @@
             app:layout_constraintTop_toBottomOf="@+id/tv_not_internet"/>
         <TextView
             android:textSize="16sp"
-            android:textColor="#fff"
+            android:textColor="@color/galaxy_text_primary"
             android:gravity="center"
             android:id="@+id/bt_try_again"
             android:background="@drawable/bt_rate_bg_light"

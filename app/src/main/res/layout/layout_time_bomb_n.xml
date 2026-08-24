@@ -155,7 +155,7 @@
         app:layout_constraintTop_toTopOf="@+id/iv_add_one_second"/>
     <TextView
         android:textSize="22sp"
-        android:textColor="#ffffffff"
+        android:textColor="@color/galaxy_text_primary"
         android:id="@+id/tv_timer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

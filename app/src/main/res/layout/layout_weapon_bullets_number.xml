@@ -9,7 +9,7 @@
         app:layout_constraintEnd_toEndOf="parent"/>
     <TextView
         android:textSize="14sp"
-        android:textColor="#ffffff"
+        android:textColor="@color/galaxy_text_primary"
         android:id="@+id/tv_bullets_number_in_cartridge_clip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -21,7 +21,7 @@
         app:layout_constraintStart_toStartOf="@+id/iv_bullets"/>
     <TextView
         android:textSize="14sp"
-        android:textColor="#ffffff"
+        android:textColor="@color/galaxy_text_primary"
         android:id="@+id/tv_separator_bullets_number"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -33,7 +33,7 @@
         app:layout_constraintStart_toEndOf="@+id/tv_bullets_number_in_cartridge_clip"/>
     <TextView
         android:textSize="14sp"
-        android:textColor="#ffffff"
+        android:textColor="@color/galaxy_text_primary"
         android:id="@+id/tv_bullets_number_all"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -44,7 +44,7 @@
         app:layout_constraintStart_toEndOf="@+id/tv_separator_bullets_number"/>
     <TextView
         android:textSize="20sp"
-        android:textColor="#ffffff"
+        android:textColor="@color/galaxy_text_primary"
         android:id="@+id/tv_unlimited"
         android:visibility="invisible"
         android:layout_width="wrap_content"

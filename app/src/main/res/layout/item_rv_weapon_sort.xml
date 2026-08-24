@@ -5,7 +5,7 @@
     android:layout_height="wrap_content">
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/weapon_sort"
-        android:background="@drawable/bg_military_category_card"
+        android:background="@drawable/bg_galaxy_card"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -25,7 +25,7 @@
             app:layout_constraintTop_toTopOf="@+id/weapon_sort"/>
         <TextView
             android:textSize="16sp"
-            android:textColor="#ffffff"
+            android:textColor="@color/galaxy_text_primary"
             android:id="@+id/tv_weapon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/rootBg"
-    android:background="#cc000000"
+    android:background="@color/galaxy_scrim_soft"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -14,7 +14,7 @@
         app:layout_constraintStart_toStartOf="parent">
         <TextView
             android:textSize="16sp"
-            android:textColor="#ffffff"
+            android:textColor="@color/galaxy_text_primary"
             android:gravity="center"
             android:id="@+id/tv_dialog_rate_title"
             android:layout_width="0dp"
@@ -29,7 +29,7 @@
             app:layout_constraintTop_toTopOf="parent"/>
         <TextView
             android:textSize="14sp"
-            android:textColor="#ffffffff"
+            android:textColor="@color/galaxy_text_primary"
             android:gravity="center_horizontal"
             android:id="@+id/tv_dialog_rate_content"
             android:layout_width="0dp"
@@ -86,7 +86,7 @@
             app:lottie_loop="false"/>
         <TextView
             android:textSize="14sp"
-            android:textColor="#3f258b"
+            android:textColor="@color/galaxy_accent"
             android:gravity="center"
             android:id="@+id/tvGuide"
             android:background="@drawable/bg_guide_rate"

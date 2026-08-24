@@ -2,7 +2,7 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <bitmap
-            android:src="@drawable/bg_galaxy_2026"
+            android:src="@drawable/gun_onboarding_beautiful"
             android:gravity="fill" />
     </item>
     <item>

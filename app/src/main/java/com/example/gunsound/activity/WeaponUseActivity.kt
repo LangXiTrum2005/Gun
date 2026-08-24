@@ -89,6 +89,7 @@ class WeaponUseActivity : AppCompatActivity() {
     private var lastTouchX = 0f
     private var lastTouchY = 0f
     private var lightsaberJitterRunnable: Runnable? = null
+    private var lightsaberIdleEnergyAnimator: ValueAnimator? = null
     private val startLightsaberHumRunnable = Runnable {
         if (weapon.type == WeaponType.LIGHTSABER && isBladeExtended) {
             soundManager.startLoopingSound("weaponsound/lightsaber/light_saber_circle_default.ogg")
@@ -125,6 +126,7 @@ class WeaponUseActivity : AppCompatActivity() {
         if (weapon.type == WeaponType.LIGHTSABER) {
             soundManager.playSound(weapon.shootSoundPath)
             soundManager.startLoopingSound("weaponsound/lightsaber/light_saber_circle_default.ogg")
+            weaponImageView.post { startLightsaberIdleEnergy() }
         }
     }
 
@@ -134,6 +136,7 @@ class WeaponUseActivity : AppCompatActivity() {
         updateMuzzleFlashPosition()
         if (wasPaused && weapon.type == WeaponType.LIGHTSABER && isBladeExtended) {
             mainHandler.postDelayed(startLightsaberHumRunnable, 120L)
+            weaponImageView.post { startLightsaberIdleEnergy() }
         }
         wasPaused = false
     }
@@ -151,6 +154,7 @@ class WeaponUseActivity : AppCompatActivity() {
         soundManager.stopLoopingSound()
         mainHandler.removeCallbacks(hideFlashRunnable)
         mainHandler.removeCallbacks(startLightsaberHumRunnable)
+        stopLightsaberIdleEnergy()
         wasPaused = true
     }
 
@@ -158,6 +162,7 @@ class WeaponUseActivity : AppCompatActivity() {
         super.onDestroy()
         stopTaserShock()
         stopLightsaberTouch()
+        stopLightsaberIdleEnergy()
         bombTimer?.cancel()
         grenadeFuseTimer?.cancel()
         TinnitusSoundGenerator.stop()
@@ -284,12 +289,15 @@ class WeaponUseActivity : AppCompatActivity() {
                         flashManager.flashOnce(50L)
                         vibrationManager.vibrateShot(60L)
                         soundManager.playSound("weaponsound/lightsaber/light_saber_shoot.ogg")
+                        stopLightsaberIdleEnergy()
                         weaponImageView.animate()
                             .scaleX(1.08f)
                             .scaleY(1.08f)
                             .setDuration(120)
                             .withEndAction {
-                                weaponImageView.animate().scaleX(1.0f).scaleY(1.0f).setDuration(120).start()
+                                weaponImageView.animate().scaleX(1.0f).scaleY(1.0f).setDuration(120).withEndAction {
+                                    startLightsaberIdleEnergy()
+                                }.start()
                             }.start()
                     }
                 }
@@ -638,10 +646,14 @@ class WeaponUseActivity : AppCompatActivity() {
 
         // 4. Single Straight Muzzle Flash Flare
         if (weapon.type == WeaponType.MECHANICAL_GUN || weapon.type == WeaponType.SCI_FI_GUN) {
-            val prefs = AppPreferences.get(this)
-            val effectIndex = prefs.currentFiringEffectIndex
-            val effect = WeaponRepository.shootEffects.getOrNull(effectIndex) ?: WeaponRepository.shootEffects.first()
-            muzzleFlashImageView.setImageResource(effect.effectDrawableRes)
+            if (weapon.type == WeaponType.SCI_FI_GUN) {
+                muzzleFlashImageView.setImageResource(R.drawable.effect_sci_fi_cosmic_laser)
+            } else {
+                val prefs = AppPreferences.get(this)
+                val effectIndex = prefs.currentFiringEffectIndex
+                val effect = WeaponRepository.shootEffects.getOrNull(effectIndex) ?: WeaponRepository.shootEffects.first()
+                muzzleFlashImageView.setImageResource(effect.effectDrawableRes)
+            }
             muzzleFlashImageView.rotation = 0f
             muzzleFlashImageView.scaleX = 1.0f
             muzzleFlashImageView.scaleY = 1.0f
@@ -649,38 +661,12 @@ class WeaponUseActivity : AppCompatActivity() {
 
             mainHandler.removeCallbacks(hideFlashRunnable)
             mainHandler.postDelayed(hideFlashRunnable, 45L)
-
-            // Sci-Fi Arc Electric Discharge
-            if (weapon.id.startsWith("sci_arc")) {
-                val drawable = weaponImageView.drawable
-                if (drawable != null) {
-                    val dWidth = drawable.intrinsicWidth.toFloat()
-                    val dHeight = drawable.intrinsicHeight.toFloat()
-                    val vWidth = weaponImageView.width.toFloat()
-                    val vHeight = weaponImageView.height.toFloat()
-                    if (dWidth > 0f && dHeight > 0f && vWidth > 0f && vHeight > 0f) {
-                        val scale = minOf(vWidth / dWidth, vHeight / dHeight)
-                        val renderedWidth = dWidth * scale
-                        val renderedHeight = dHeight * scale
-                        val offsetX = (vWidth - renderedWidth) / 2f
-                        val offsetY = (vHeight - renderedHeight) / 2f
-
-                        val muzzleX = offsetX + renderedWidth * weapon.muzzleXPercent
-                        val muzzleY = offsetY + renderedHeight * weapon.muzzleYPercent
-                        val targetX = muzzleX + (Random.nextFloat() * 50f - 25f) * resources.displayMetrics.density
-                        val targetY = muzzleY - (130 * resources.displayMetrics.density)
-
-                        electricArcView.startShock(muzzleX, muzzleY, targetX, targetY)
-                        mainHandler.postDelayed({
-                            electricArcView.stopShock()
-                        }, 130L)
-                    }
-                }
-            }
         }
 
         // 5. Bullet Drop Effect
-        spawnBulletDrop()
+        if (weapon.type == WeaponType.MECHANICAL_GUN) {
+            spawnBulletDrop()
+        }
     }
 
     private fun startFlamethrower() {
@@ -1239,9 +1225,46 @@ class WeaponUseActivity : AppCompatActivity() {
         weaponImageView.pivotY = height * 0.82f
     }
 
+    private fun startLightsaberIdleEnergy() {
+        if (weapon.type != WeaponType.LIGHTSABER || !isBladeExtended || !::weaponImageView.isInitialized) return
+        if (lightsaberIdleEnergyAnimator?.isStarted == true) return
+
+        prepareLightsaberPivot()
+        lightsaberIdleEnergyAnimator = ValueAnimator.ofFloat(0f, 1f).apply {
+            duration = 920L
+            repeatCount = ValueAnimator.INFINITE
+            repeatMode = ValueAnimator.REVERSE
+            interpolator = LinearInterpolator()
+            addUpdateListener { animator ->
+                if (weapon.type != WeaponType.LIGHTSABER || !isBladeExtended) {
+                    stopLightsaberIdleEnergy()
+                    return@addUpdateListener
+                }
+
+                val pulse = animator.animatedValue as Float
+                val energyScale = 1f + (pulse * 0.018f)
+                weaponImageView.scaleX = energyScale
+                weaponImageView.scaleY = energyScale
+                weaponImageView.alpha = 0.92f + (pulse * 0.08f)
+            }
+            start()
+        }
+    }
+
+    private fun stopLightsaberIdleEnergy() {
+        lightsaberIdleEnergyAnimator?.cancel()
+        lightsaberIdleEnergyAnimator = null
+        if (::weaponImageView.isInitialized && isBladeExtended) {
+            weaponImageView.scaleX = 1f
+            weaponImageView.scaleY = 1f
+            weaponImageView.alpha = 1f
+        }
+    }
+
     private fun resetLightsaberVisualState() {
         if (!::weaponImageView.isInitialized) return
         mainHandler.removeCallbacks(startLightsaberHumRunnable)
+        stopLightsaberIdleEnergy()
         weaponImageView.animate().cancel()
         weaponImageView.rotation = 0f
         weaponImageView.translationX = 0f
@@ -1298,6 +1321,7 @@ class WeaponUseActivity : AppCompatActivity() {
                 weaponImageView.scaleY = 1.0f
                 weaponImageView.alpha = 1.0f
                 isReloading = false
+                startLightsaberIdleEnergy()
             }
             .start()
     }
